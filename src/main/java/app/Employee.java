@@ -21,8 +21,8 @@ public class Employee {
 
     public void logOut(){
         this.loggedIn = false;
-
     }
+
     public boolean isLoggedIn(){
         return this.loggedIn;
     }
@@ -44,9 +44,26 @@ public class Employee {
     }
 
     public Project createProject(ProjectSystem system) {
+        if (!loggedIn) {
+            throw new IllegalArgumentException("Employee must be logged in to create a project.");
+        }
+
         if (tempProjectName == null || tempProjectName.trim().isEmpty()) {
             throw new IllegalArgumentException("Project name missing. Project has not been created.");
         }
+
+        if (tempStartDate == null) {
+            throw new IllegalArgumentException("Invalid date format. Project has not been created.");
+        }
+
+        if (tempEndDate == null) {
+            throw new IllegalArgumentException("Invalid date format. Project has not been created.");
+        }
+
+        if (tempStartDate.isAfter(tempEndDate)) {
+            throw new IllegalArgumentException("Start date must be before or equal to end date. Project has not been created.");
+        }
+
         return system.createProject(tempProjectName, tempStartDate, tempEndDate);
     }
 
