@@ -22,7 +22,7 @@ public class Employee {
         this.loggedIn = false;
 
     }
-    public boolean isLoggedInStatus(){
+    public boolean isLoggedIn(){
         return this.loggedIn;
     }
 
@@ -43,6 +43,9 @@ public class Employee {
     }
 
     public Project createProject(ProjectSystem system) {
+        if (tempProjectName == null || tempProjectName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Project name missing. Project has not been created.");
+        }
         return system.createProject(tempProjectName, tempStartDate, tempEndDate);
     }
 }

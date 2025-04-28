@@ -12,18 +12,16 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class CreateProjectSteps {
     private Employee employee;
-    private ProjectSystem projectSystem = new ProjectSystem();
+    private ProjectSystem projectSystem;
     private Project createdProject;
+    private String errorMessage;
 
-    @Given("an employee with name {string} is logged in")
+    @Given("an employee with initials {string} is logged in")
     public void anEmployeeWithNameIsLoggedIn(String arg0) {
+        projectSystem = new ProjectSystem(); // Always start fresh for each scenario!
         employee = new Employee(arg0);
         employee.logIn();
-        assertTrue(employee.isLoggedInStatus());
-    }
-
-    @When("the employee creates a project")
-    public void theEmployeeCreatesAProject() {
+        assertTrue(employee.isLoggedIn());
     }
 
     @When("the employee inputs name {string}")
@@ -45,7 +43,6 @@ public class CreateProjectSteps {
 
     @Then("the system creates the project {string}")
     public void theSystemCreatesTheProject(String expectedName) {
-        createdProject = employee.createProject(projectSystem);
         assertEquals(expectedName, createdProject.getName());
     }
 
@@ -56,13 +53,31 @@ public class CreateProjectSteps {
 
     @And("the employee inputs and empty name")
     public void theEmployeeInputsAndEmptyName() {
+        employee.inputProjectName(""); // Actually input an empty string
     }
 
     @Then("the system outputs the error message {string}")
-    public void theSystemOutputsTheErrorMessage(String arg0) {
+    public void theSystemOutputsTheErrorMessage(String expectedErrorMessage) {
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            employee.createProject(projectSystem);
+        });
+        errorMessage = exception.getMessage();
+        assertEquals(expectedErrorMessage, errorMessage);
     }
 
     @And("the project is not created")
     public void theProjectIsNotCreated() {
+        assertNull(createdProject);
     }
+
+    @And("the employee creates the project")
+    public void theEmployeeCreatesTheProject() {
+        try {
+            createdProject = employee.createProject(projectSystem);
+        } catch (IllegalArgumentException e) {
+            errorMessage = e.getMessage();
+            createdProject = null;
+        }
+    }
+
 }
