@@ -9,7 +9,9 @@ public class Project {
     private String id;
     private LocalDate startDate;
     private LocalDate endDate;
+    private List<Employee> employees = new ArrayList<>();
     private final List<Activity> activities = new ArrayList<>();
+    private ProjectManager projectManager;
 
     public Project(String name, String id, LocalDate start, LocalDate end) {
         this.name = name;
@@ -47,8 +49,37 @@ public class Project {
         return null;
     }
 
+    public void addEmployee(Employee employee) {
+        this.employees.add(employee);
+    }
+
     public List<Activity> getActivities() {
         return new ArrayList<>(activities); // Return a copy to protect internal list
     }
-}
 
+    public void setProjectManager(ProjectManager manager) {
+        this.projectManager = manager;
+    }
+
+    public ProjectManager getProjectManager() {
+        return projectManager;
+    }
+
+    public void assignProjectManager(Employee assigningEmployee, ProjectManager newManager) {
+        // If the project already has a manager, only the current manager can assign a new one
+        if (this.projectManager != null) {
+            if (this.projectManager.getId().equals(assigningEmployee.getId())) {
+                setProjectManager(newManager);  // Assign the new manager
+                // Add this project to the new manager's list of projects
+                newManager.addProject(this);
+            } else {
+                throw new IllegalStateException(assigningEmployee.getId() + " is not the project manager and cannot assign one.");
+            }
+        } else {
+            // If no project manager is assigned yet, anyone can assign one
+            setProjectManager(newManager);
+            // Add this project to the new manager's list of projects
+            newManager.addProject(this);
+        }
+    }
+}

@@ -1,49 +1,67 @@
 package hellocucumber;
 
-import io.cucumber.java.PendingException;
+import app.Employee;
+import app.Project;
+import app.ProjectManager;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
+import java.time.LocalDate;
+
+import static org.junit.jupiter.api.Assertions.*;
+
 public class AddProjectManagerToProjectSteps {
-    @And("no project manager is assigned to project {string}")
-    public void noProjectManagerIsAssignedToProject(String arg0) {
-        throw new PendingException();
+    private Project project;
+    private Employee employee;
+    private ProjectManager projectManager;
+
+    @Given("a project {string} exists with no manager")
+    public void aProjectExists(String projectName) {
+        LocalDate startDate = LocalDate.now();  // For example, using today's date
+        LocalDate endDate = LocalDate.now().plusMonths(6);  // For example, 6 months from now
+        String projectId = "0001";  // Example project ID (you can generate this dynamically)
+        project = new Project(projectName, projectId, startDate, endDate);
     }
 
-    @When("an available project manager {string} is assigned to project {string} by employee {string}")
-    public void anAvailableProjectManagerIsAssignedToProjectByEmployee(String arg0, String arg1, String arg2) {
-        throw new PendingException();
+    @And("an employee with id {string} is assigned to {string}")
+    public void anEmployeeWithIdIsAssignedTo(String employeeId, String projectName) {
+        employee = new Employee(employeeId);
+        project.addEmployee(employee);  // Assumes Project has an addEmployee method
     }
 
-    @Then("{string} can see project {string} in the list of projects where {string} is the project manager")
-    public void canSeeProjectInTheListOfProjectsWhereIsTheProjectManager(String arg0, String arg1, String arg2) {
-        throw new PendingException();
+    @And("no Project Manager is assigned to {string}")
+    public void noProjectManagerIsAssignedTo(String projectName) {
+        project.setProjectManager(null);  // Assumes Project has setProjectManager method
     }
 
-    @And("{string} is now the project manager of project {string}")
-    public void isNowTheProjectManagerOfProject(String arg0, String arg1) {
-        throw new PendingException();
+    @When("{string} assigns {string} as project manager to {string}")
+    public void assignsAsProjectManagerTo(String employeeId, String managerId, String projectName) {
+        employee = new Employee(employeeId);
+        projectManager = new ProjectManager(managerId);  // Create project manager
+        project.assignProjectManager(employee, projectManager);  // Assumes a method in Project class for this
     }
 
-    @Given("an employee {string}")
-    public void anEmployee(String arg0) {
-        throw new PendingException();
+
+    @Then("{string} should be able to see {string} in their list of managed projects")
+    public void shouldBeAbleToSeeInTheirListOfManagedProjects(String managerId, String projectName) {
+        // Get the project manager assigned to the project
+        ProjectManager manager = project.getProjectManager();  // Use the manager assigned to the project
+
+        // Check if the manager can see the project in their list of managed projects
+        boolean isManaged = manager.getManagedProjects().stream()
+                .anyMatch(project -> project.getName().equals(projectName));
+
+        assertTrue(isManaged);  // Assert that the project is indeed in the manager's list
+    }
+    @And("{string} should be the project manager of {string}")
+    public void shouldBeTheProjectManagerOf(String managerId, String projectName) {
+        assertEquals(managerId, project.getProjectManager().getId());  // Check the project manager ID
     }
 
-    @And("no project has been created")
-    public void noProjectHasBeenCreated() {
-        throw new PendingException();
-    }
-
-    @When("{string} tries to assign a project manager {string} to the project that doesn't exist")
-    public void triesToAssignAProjectManagerToTheProjectThatDoesnTExist(String arg0, String arg1) {
-        throw new PendingException();
-    }
-
-    @Then("{string} will get an error message saying that {string}")
-    public void willGetAnErrorMessageSayingThat(String arg0, String arg1) {
-        throw new PendingException();
+    @And("{string} should now be of the ProjectManager class")
+    public void shouldNowBeOfTheProjectManagerClass(String managerId) {
+        assertTrue(project.getProjectManager() instanceof ProjectManager);  // Check the class type
     }
 }
