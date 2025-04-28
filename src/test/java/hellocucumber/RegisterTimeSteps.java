@@ -1,6 +1,7 @@
 package hellocucumber;
 
 import io.cucumber.java.en.And;
+import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
@@ -21,6 +22,12 @@ public class RegisterTimeSteps {
     private int registeredFreeDays;
     private LocalDate sickLeaveStart;
     private LocalDate sickLeaveEnd;
+
+    @Given("an employee with id {string} is logged in")
+    public void anEmployeeWithIdIsLoggedIn(String employeeId) {
+        this.loggedInEmployeeId = employeeId;
+    }
+
 
     @And("that the employee is assigned to an {string} under {string}")
     public void thatTheEmployeeIsAssignedToAnUnder(String activityName, String projectName) {
