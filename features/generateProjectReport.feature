@@ -23,3 +23,22 @@ Feature: Generate project report
     Then the system displays the total registered hours as 0
     And the system displays the budgeted time as 50
     And the system warns "No work has been registered on this project yet"
+
+  Scenario: Generating a report for a non-existent project
+    Given no project named "NonExistingProject" exists
+    And the project manager is logged in
+    When the project manager attempts to generate a report for "NonExistingProject"
+    Then the system displays an error message "Project not found"
+
+  Scenario: Generating a report when budgeted time is not set
+    Given a project "ProjectZ" exists
+    And "ProjectZ" has no budgeted time set
+    And the total registered work time on "ProjectZ" is 10 hours
+    And the project manager is logged in
+    When the project manager generates a report for "ProjectZ"
+    Then the system displays an error message "Budgeted time is missing for this project"
+
+  Scenario: Generating a report when no project is selected
+    Given the project manager is logged in
+    When the project manager attempts to generate a report without selecting a project
+    Then the system displays an error message "No project selected"
