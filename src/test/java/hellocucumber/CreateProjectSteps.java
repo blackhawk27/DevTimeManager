@@ -54,4 +54,15 @@ public class CreateProjectSteps {
         assertEquals(expectedId, createdProject.getId());
     }
 
+    @And("the employee inputs and empty name")
+    public void theEmployeeInputsAndEmptyName() {
+    }
+
+    @Then("the system outputs the error message {string}")
+    public void theSystemOutputsTheErrorMessage(String arg0) {
+    }
+
+    @And("the project is not created")
+    public void theProjectIsNotCreated() {
+    }
 }
