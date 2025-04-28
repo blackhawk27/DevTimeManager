@@ -1,44 +1,32 @@
 package hellocucumber;
 
-import io.cucumber.java.PendingException;
-import io.cucumber.java.en.And;
-import io.cucumber.java.en.Given;
-import io.cucumber.java.en.Then;
-import io.cucumber.java.en.When;
-
 public class RegisterTimeSteps {
-    @Given("the employee is logged in")
-    public void theEmployeeIsLoggedIn() {
-        throw new PendingException();
-    }
-
-    @And("that an employee is assigned to an {string} under {string}")
-    public void thatAnEmployeeIsAssignedToAnUnder(String arg0, String arg1) {
-        throw new PendingException();
-    }
-
-    @When("the employee registers in the system that he arrived at {int}:{int} and left at {int}:{int}")
-    public void theEmployeeRegistersInTheSystemThatHeArrivedAtAndLeftAt(int arg0, int arg1, int arg2, int arg3) {
-        throw new PendingException();
-    }
-
-    @Then("the employee has worked {int} hours on {string}")
-    public void theEmployeeHasWorkedHoursOn(int arg0, String arg1) {
-        throw new PendingException();
-    }
-
-    @And("he has registered his time from {int}:{int} to {int}:{int}")
-    public void heHasRegisteredHisTimeFromTo(int arg0, int arg1, int arg2, int arg3) {
-        throw new PendingException();
-    }
-
-    @When("the employee later corrects time spent in the system to say he arrived at {int}:{int} and left at {int}:{int}")
-    public void theEmployeeLaterCorrectsTimeSpentInTheSystemToSayHeArrivedAtAndLeftAt(int arg0, int arg1, int arg2, int arg3) {
-        throw new PendingException();
-    }
-
-    @Then("the employee has worked {int} hours on {string} instead of {int}")
-    public void theEmployeeHasWorkedHoursOnInsteadOf(int arg0, String arg1, int arg2) {
-        throw new PendingException();
+    public RegisterTimeSteps() {
+        Given("^an employee with id \"([^\"]*)\" is logged in$", (String arg0) -> {
+        });
+        And("^that the employee is assigned to an \"([^\"]*)\" under \"([^\"]*)\"$", (String arg0, String arg1) -> {
+        });
+        When("^the employee registers in the system that he started to work on \"([^\"]*)\" under \"([^\"]*)\" at (\\d+):(\\d+) and stopped at (\\d+):(\\d+)$", (String arg0, String arg1, Integer arg2, Integer arg3, Integer arg4, Integer arg5) -> {
+        });
+        Then("^the employee has worked (\\d+) hours on \"([^\"]*)\" under \"([^\"]*)\"$", (Integer arg0, String arg1, String arg2) -> {
+        });
+        And("^the employee registers in the system that he started to work on \"([^\"]*)\" under \"([^\"]*)\" at (\\d+):(\\d+) and stopped at (\\d+):(\\d+)$", (String arg0, String arg1, Integer arg2, Integer arg3, Integer arg4, Integer arg5) -> {
+        });
+        When("^the employee later corrects time spent in the system to say he started to work on \"([^\"]*)\" under \"([^\"]*)\" at (\\d+):(\\d+) and stopped at (\\d+):(\\d+)$", (String arg0, String arg1, Integer arg2, Integer arg3, Integer arg4, Integer arg5) -> {
+        });
+        Then("^the employee has worked (\\d+) hours on \"([^\"]*)\" under \"([^\"]*)\" instead of (\\d+) hours$", (Integer arg0, String arg1, String arg2, Integer arg3) -> {
+        });
+        When("^the employee registers freetime from day \"([^\"]*)\" up to and including \"([^\"]*)\"$", (String arg0, String arg1) -> {
+        });
+        Then("^the employee has (\\d+) days of free time$", (Integer arg0) -> {
+        });
+        And("^the employee has registered work time on \"([^\"]*)\" under \"([^\"]*)\" on \"([^\"]*)\"$", (String arg0, String arg1, String arg2) -> {
+        });
+        And("^the employee want to update the excisting registration on \"([^\"]*)\"$", (String arg0) -> {
+        });
+        When("^the employee updates the registration to sick leave and gives an end date on \"([^\"]*)\"$", (String arg0) -> {
+        });
+        Then("^the time in period \"([^\"]*)\" up to and including \"([^\"]*)\" is updated as sick leave$", (String arg0, String arg1) -> {
+        });
     }
 }
