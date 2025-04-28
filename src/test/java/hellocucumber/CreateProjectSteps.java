@@ -16,7 +16,7 @@ public class CreateProjectSteps {
     private Project createdProject;
     private String errorMessage;
 
-    @Given("an employee with initials {string} is logged in")
+    @Given("an employee with id {string} is logged in")
     public void anEmployeeWithNameIsLoggedIn(String arg0) {
         projectSystem = new ProjectSystem(); // Always start fresh for each scenario!
         employee = new Employee(arg0);
