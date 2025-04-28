@@ -22,14 +22,14 @@ public class AddProjectManagerToProjectSteps {
     public void aProjectExists(String projectName) {
         LocalDate startDate = LocalDate.now();  // For example, using today's date
         LocalDate endDate = LocalDate.now().plusMonths(6);  // For example, 6 months from now
-        String projectId = "0001";  // Example project ID (you can generate this dynamically)
+        String projectId = "250001";  // Example project ID (you can generate this dynamically)
         project = new Project(projectName, projectId, startDate, endDate);
     }
 
     @And("an employee with id {string} is assigned to {string}")
     public void anEmployeeWithIdIsAssignedTo(String employeeId, String projectName) {
         employee = new Employee(employeeId);
-        project.addEmployee(employee);  // Assumes Project has an addEmployee method
+        project.addEmployee(employee);
     }
 
     @And("no Project Manager is assigned to {string}")
@@ -92,6 +92,11 @@ public class AddProjectManagerToProjectSteps {
     public void willGetAnErrorMessage(String assigningEmployeeId, String expectedMessage) {
         // Check if the error message is correct
         assertEquals(expectedMessage, errorMessage);
+    }
+
+    @And("an employee with id {string} is not assigned to {string}")
+    public void anEmployeeWithIdIsNotAssignedTo(String employeeId, String projectName) {
+        employee = new Employee(employeeId);
     }
 
     @And("{string} should now be of the ProjectManager class")

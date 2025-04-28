@@ -16,3 +16,11 @@ Feature: Add project manager to project
     Given a project "New Website" exists with "E123" as the project manager
     When "E456" tries to assign "E456" as the project manager of "New Website"
     Then "E456" will get an error message "This project already has a project manager. You cannot assign a new one."
+
+  Scenario: Unsuccessfully adding a project manager because acting employee is not part of the project
+    Given a project "New Website" exists with no manager
+    And an employee with id "E123" is assigned to "New Website"
+    And an employee with id "E456" is not assigned to "New Website"
+    When "E456" tries to assign "E456" as the project manager of "New Website"
+    Then "E456" will get an error message "E456 is not assigned to the project and cannot assign a manager."
+

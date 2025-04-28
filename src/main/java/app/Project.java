@@ -66,15 +66,22 @@ public class Project {
     }
 
     public void assignProjectManager(Employee assigningEmployee, ProjectManager newManager) {
-        if (this.projectManager != null) {
-            // If the project already has a manager, only the current manager can assign a new one
-            throw new IllegalStateException("This project already has a project manager. You cannot assign a new one.");
-        } else {
-            // If no project manager is assigned yet, anyone can assign one
-            setProjectManager(newManager);
-            // Add this project to the new manager's list of projects
-            newManager.addProject(this);
+        // NEW: ensure the acting employee is actually on this project
+        if (!employees.contains(assigningEmployee)) {
+            throw new IllegalStateException(
+                    assigningEmployee.getId()
+                            + " is not assigned to the project and cannot assign a manager."
+            );
         }
+        if (this.projectManager != null) {
+            throw new IllegalStateException(
+                    "This project already has a project manager. You cannot assign a new one."
+            );
+        }
+        // no manager yet → OK
+        setProjectManager(newManager);
+        newManager.addProject(this);
     }
+
 
 }
