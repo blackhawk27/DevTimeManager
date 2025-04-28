@@ -16,6 +16,7 @@ public class AddProjectManagerToProjectSteps {
     private Project project;
     private Employee employee;
     private ProjectManager projectManager;
+    private String errorMessage;
 
     @Given("a project {string} exists with no manager")
     public void aProjectExists(String projectName) {
@@ -58,6 +59,39 @@ public class AddProjectManagerToProjectSteps {
     @And("{string} should be the project manager of {string}")
     public void shouldBeTheProjectManagerOf(String managerId, String projectName) {
         assertEquals(managerId, project.getProjectManager().getId());  // Check the project manager ID
+    }
+
+    @Given("a project {string} exists with {string} as the project manager")
+    public void aProjectExistsWithManager(String projectName, String managerId) {
+        LocalDate startDate = LocalDate.now();
+        LocalDate endDate = LocalDate.now().plusMonths(6);
+        String projectId = "0001";  // Example project ID
+        project = new Project(projectName, projectId, startDate, endDate);
+
+        // Assign the project manager
+        ProjectManager manager = new ProjectManager(managerId);
+        project.setProjectManager(manager);
+        manager.addProject(project);
+    }
+
+    @When("{string} tries to assign {string} as the project manager of {string}")
+    public void triesToAssignAsProjectManagerOf(String assigningEmployeeId, String newManagerId, String projectName) {
+        // Set up the assigning employee and the new project manager
+        Employee assigningEmployee = new Employee(assigningEmployeeId);
+        ProjectManager newManager = new ProjectManager(newManagerId);
+
+        try {
+            // Try assigning project manager
+            project.assignProjectManager(assigningEmployee, newManager);
+        } catch (IllegalStateException e) {
+            errorMessage = e.getMessage();  // Catch the error message
+        }
+    }
+
+    @Then("{string} will get an error message {string}")
+    public void willGetAnErrorMessage(String assigningEmployeeId, String expectedMessage) {
+        // Check if the error message is correct
+        assertEquals(expectedMessage, errorMessage);
     }
 
     @And("{string} should now be of the ProjectManager class")

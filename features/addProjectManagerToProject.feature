@@ -12,3 +12,7 @@ Feature: Add project manager to project
     And "E456" should be the project manager of "New Website"
     And "E456" should now be of the ProjectManager class
 
+  Scenario: Unsuccessfully adding a project manager to a project that already has a manager
+    Given a project "New Website" exists with "E123" as the project manager
+    When "E456" tries to assign "E456" as the project manager of "New Website"
+    Then "E456" will get an error message "This project already has a project manager. You cannot assign a new one."
