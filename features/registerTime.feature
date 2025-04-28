@@ -5,14 +5,14 @@ Feature: Register time
   Scenario: Successfully register time on activity
     Given an employee with id "E123" is logged in
     And that the employee is assigned to an "ActivityX" under "ProjectY"
-    When the employee registers in the system that he started to work on "ActivityX" under "ProjectY" at 09:00 and stopped at 17:00
+    When the employee registers in the system that he started to work on "ActivityX" under "ProjectY" at "09:00" and stopped at "17:00"
     Then the employee has worked 8 hours on "ActivityX" under "ProjectY"
 
   Scenario: Updating wrongly registered time on activity
     Given an employee with id "E123" is logged in
     And that the employee is assigned to an "ActivityX" under "ProjectY"
-    And the employee registers in the system that he started to work on "ActivityX" under "ProjectY" at 09:00 and stopped at 15:00
-    When the employee later corrects time spent in the system to say he started to work on "ActivityX" under "ProjectY" at 09:00 and stopped at 17:00
+    And the employee registers in the system that he started to work on "ActivityX" under "ProjectY" at "09:00" and stopped at "15:00"
+    When the employee later corrects time spent in the system to say he started to work on "ActivityX" under "ProjectY" at "09:00" and stopped at "17:00"
     Then the employee has worked 8 hours on "ActivityX" under "ProjectY" instead of 6 hours
 
   Scenario: Registering free time
