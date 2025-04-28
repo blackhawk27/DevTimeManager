@@ -18,3 +18,10 @@ Feature: Add Employee
     When "E123" is assigned to "Front End Development"
     Then the system should return an error message "E123 cannot be assigned to more than 10 activities"
 
+  Scenario: Unsuccessful assignment of employee to activity because employee is already assigned to activity
+    Given a project "New Website" exists
+    And an activity "Front End Development" exists in "New Website"
+    And an employee with id "E123" exists
+    And "E123" is assigned to "Front End Development"
+    When "E123" is assigned to "Front End Development" again
+    Then the system should return an error message "E123 is already assigned to Front End Development"

@@ -16,6 +16,9 @@ public class Activity {
     }
 
     public void assignEmployee(Employee employee) {
+        if (isEmployeeAssigned(employee)) {
+            throw new IllegalArgumentException(employee.getId() + " is already assigned to " + name);
+        }
         if(!employee.canTakeMoreActivities()){
             throw new IllegalArgumentException(employee.getId() + " cannot be assigned to more than 10 activities");
         }

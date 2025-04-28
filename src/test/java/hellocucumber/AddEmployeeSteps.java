@@ -61,4 +61,13 @@ public class AddEmployeeSteps {
     public void theSystemShouldReturnAnErrorMessage(String expectedMessage) {
         assertEquals(expectedMessage, errorMessage);
     }
+
+    @When("{string} is assigned to {string} again")
+    public void isAssignedToAgain(String id, String activityName) {
+        try {
+            activity.assignEmployee(employee);
+        } catch (Exception e) {
+            errorMessage = e.getMessage();
+        }
+    }
 }
