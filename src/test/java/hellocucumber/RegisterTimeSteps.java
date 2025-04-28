@@ -53,8 +53,8 @@ public class RegisterTimeSteps {
         assertEquals(correctedHours, calculatedWorkHours, "Corrected worked hours mismatch");
     }
 
-    @When("the employee registers freetime from day {string} up to and including {string}")
-    public void theEmployeeRegistersFreetimeFromDayUpToAndIncluding(String startDateStr, String endDateStr) {
+    @When("the employee registers free time from day {string} up to and including {string}")
+    public void theEmployeeRegistersFreeTimeFromDayUpToAndIncluding(String startDateStr, String endDateStr) {
         LocalDate startDate = LocalDate.parse(startDateStr);
         LocalDate endDate = LocalDate.parse(endDateStr);
         registeredFreeDays = (int) (endDate.toEpochDay() - startDate.toEpochDay()) + 1;
@@ -71,8 +71,8 @@ public class RegisterTimeSteps {
         dayRegistrations.put(workDate, "work");
     }
 
-    @And("the employee want to update the excisting registration on {string}")
-    public void theEmployeeWantToUpdateTheExcistingRegistrationOn(String startDateStr) {
+    @And("the employee want to update the existing registration on {string}")
+    public void theEmployeeWantToUpdateTheExistingRegistrationOn(String startDateStr) {
         sickLeaveStart = LocalDate.parse(startDateStr);
     }
 
@@ -96,6 +96,8 @@ public class RegisterTimeSteps {
             current = current.plusDays(1);
         }
     }
+
+
 
     // Helper class
     private static class WorkSession {
