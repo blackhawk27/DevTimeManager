@@ -2,6 +2,7 @@ package hellocucumber;
 
 import io.cucumber.java.PendingException;
 import io.cucumber.java.en.And;
+import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
@@ -59,5 +60,26 @@ public class GenerateProjectReportSteps {
     @And("the system warns {string}")
     public void theSystemWarns(String arg0) {
         throw new PendingException();
+    }
+
+    @Given("no project named {string} exists")
+    public void noProjectNamedExists(String arg0) {
+
+    }
+
+    @When("the project manager attempts to generate a report for {string}")
+    public void theProjectManagerAttemptsToGenerateAReportFor(String arg0) {
+    }
+
+    @Then("the system displays an error message {string}")
+    public void theSystemDisplaysAnErrorMessage(String arg0) {
+    }
+
+    @And("{string} has no budgeted time set")
+    public void hasNoBudgetedTimeSet(String arg0) {
+    }
+
+    @When("the project manager attempts to generate a report without selecting a project")
+    public void theProjectManagerAttemptsToGenerateAReportWithoutSelectingAProject() {
     }
 }
