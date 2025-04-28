@@ -16,10 +16,16 @@ public class Activity {
     }
 
     public void assignEmployee(Employee employee) {
+        if(!employee.canTakeMoreActivities()){
+            throw new IllegalArgumentException(employee.getId() + " cannot be assigned to more than 10 activities");
+        }
         assignedEmployees.add(employee);
+        employee.addToActivity();
     }
 
     public boolean isEmployeeAssigned(Employee employee) {
         return assignedEmployees.contains(employee);
     }
+
+
 }

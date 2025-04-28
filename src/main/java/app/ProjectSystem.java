@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ProjectSystem {
-    private static ProjectSystem instance;
     private int projectCounter = 1;
     private List<Project> projects = new ArrayList<>();
 

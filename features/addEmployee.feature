@@ -11,9 +11,10 @@ Feature: Add Employee
 
   Scenario: Add Employee to activity unsuccessfully because too many
   activities
-    Given a project "ProjectX" exists
-    And an activity "ActivityY" exists "ProjectX"
-    And an employee "E123" exists
+    Given a project "New Website" exists
+    And an activity "Front End Development" exists in "New Website"
+    And an employee with id "E123" exists
     And "E123" is already assigned to 10 activities
-    When "E123" is assigned to "ActivityY"
-    Then the system should return an error message "E123" "cannot be assigned to more than 10 activities"
+    When "E123" is assigned to "Front End Development"
+    Then the system should return an error message "E123 cannot be assigned to more than 10 activities"
+

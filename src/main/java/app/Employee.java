@@ -4,13 +4,14 @@ import java.time.LocalDate;
 
 public class Employee {
     public boolean loggedIn;
-    private final String initials;
+    private final String id;
     private String tempProjectName;
     private LocalDate tempStartDate;
     private LocalDate tempEndDate;
+    private int assignedActivitiesCount = 0;
 
-    public Employee(String initials) {
-        this.initials = initials;
+    public Employee(String id) {
+        this.id = id;
         this.loggedIn = false;
     }
 
@@ -26,8 +27,8 @@ public class Employee {
         return this.loggedIn;
     }
 
-    public String getInitials(){
-        return this.initials;
+    public String getId(){
+        return this.id;
     }
 
     public void inputProjectName(String name) {
@@ -47,5 +48,13 @@ public class Employee {
             throw new IllegalArgumentException("Project name missing. Project has not been created.");
         }
         return system.createProject(tempProjectName, tempStartDate, tempEndDate);
+    }
+
+    public boolean canTakeMoreActivities() {
+        return assignedActivitiesCount < 10;
+    }
+
+    public void addToActivity() {
+        assignedActivitiesCount++;
     }
 }
