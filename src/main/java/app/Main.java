@@ -182,7 +182,46 @@ public class Main {
     }
 
     private static void updateTimeEntry() {
-        return;
+        System.out.println("Which type do you want to update?");
+        System.out.println("Options: Work / SickDay / FreeTime / Course");
+        String type = scanner.nextLine().trim();
+
+        ArrayList<String> dateInputs = new ArrayList<>();
+
+        if (type.equalsIgnoreCase("Work")) {
+            System.out.print("Project name: ");
+            String projectName = scanner.nextLine().trim();
+
+            System.out.print("Activity name: ");
+            String activityName = scanner.nextLine().trim();
+
+            System.out.print("New start time (yyyy-MM-dd-HH:mm): ");
+            dateInputs.add(scanner.nextLine().trim());
+
+            System.out.print("New end time (yyyy-MM-dd-HH:mm): ");
+            dateInputs.add(scanner.nextLine().trim());
+
+            try {
+                currentEmployee.registerTime("Work", dateInputs, projectName, activityName, projectSystem);
+                System.out.println("Work time card updated.");
+            } catch (Exception e) {
+                System.out.println("Error: " + e.getMessage());
+            }
+
+        } else {
+            System.out.print("New start date (yyyy-MM-dd): ");
+            dateInputs.add(scanner.nextLine().trim());
+
+            System.out.print("New end date (yyyy-MM-dd): ");
+            dateInputs.add(scanner.nextLine().trim());
+
+            try {
+                currentEmployee.registerTime(type, dateInputs, "", "", projectSystem);
+                System.out.println(type + " updated.");
+            } catch (Exception e) {
+                System.out.println("Error: " + e.getMessage());
+            }
+        }
     }
 
     private static void assignProjectManager() {
