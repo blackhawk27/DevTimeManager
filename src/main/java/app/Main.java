@@ -55,6 +55,7 @@ public class Main {
         try {
             System.out.println("Please enter your project name:");
             String projectName = scanner.nextLine();
+            currentEmployee.inputProjectName(projectName);
             System.out.println("Please enter start date (dd/mm/yyyy):");
             LocalDate startDate = LocalDate.parse(scanner.nextLine(), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
             currentEmployee.inputStartDate(startDate);
