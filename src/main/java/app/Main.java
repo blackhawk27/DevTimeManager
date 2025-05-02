@@ -6,6 +6,7 @@ import app.ProjectSystem;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Main {
@@ -126,6 +127,61 @@ public class Main {
     }
 
     private static void registerTime() {
+        System.out.println("Do you want to:");
+        System.out.println("1 - Register new time");
+        System.out.println("2 - Update existing time entry");
+        String choice = scanner.nextLine().trim();
+
+        switch (choice) {
+            case "1" -> registerNewTime();
+            case "2" -> updateTimeEntry();
+            default -> System.out.println("Invalid choice");
+        }
+    }
+
+    private static void registerNewTime() {
+        System.out.print("Type of entry (Work / SickDay / FreeTime / Course): ");
+        String type = scanner.nextLine().trim();
+
+        ArrayList<String> dateInputs = new ArrayList<>();
+
+        if (type.equalsIgnoreCase("Work")) {
+            System.out.print("Project name: ");
+            String projectName = scanner.nextLine().trim();
+
+            System.out.print("Activity name: ");
+            String activityName = scanner.nextLine().trim();
+
+            System.out.print("Start time (yyyy-MM-dd-HH:mm): ");
+            dateInputs.add(scanner.nextLine().trim());
+
+            System.out.print("End time (yyyy-MM-dd-HH:mm): ");
+            dateInputs.add(scanner.nextLine().trim());
+
+            try {
+                currentEmployee.registerTime("Work", dateInputs, projectName, activityName, projectSystem);
+                System.out.println("Work time registered.");
+            } catch (Exception e) {
+                System.out.println("Error: " + e.getMessage());
+            }
+
+        } else {
+            System.out.print("Start date (yyyy-MM-dd): ");
+            dateInputs.add(scanner.nextLine().trim());
+
+            System.out.print("End date (yyyy-MM-dd): ");
+            dateInputs.add(scanner.nextLine().trim());
+
+            try {
+                currentEmployee.registerTime(type, dateInputs, "", "", projectSystem);
+                System.out.println(type + " registered.");
+            } catch (Exception e) {
+                System.out.println("Error: " + e.getMessage());
+            }
+        }
+    }
+
+    private static void updateTimeEntry() {
         return;
     }
 
