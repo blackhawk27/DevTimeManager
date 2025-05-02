@@ -1,6 +1,7 @@
 package hellocucumber;
 
 import app.Activity;
+import app.Employee;
 import app.Project;
 import app.TimeEntry;
 import io.cucumber.java.PendingException;
@@ -68,7 +69,8 @@ public class GenerateProjectReportSteps {
 
     @And("the project manager is logged in")
     public void theProjectManagerIsLoggedIn() {
-        //ingenting
+        Employee projectManager = new Employee("E123");
+        projectManager.logIn();
     }
 
     @When("the project manager generates a report for {string}")
