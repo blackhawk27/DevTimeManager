@@ -3,6 +3,7 @@ package hellocucumber;
 import app.Employee;
 import app.Project;
 import app.ProjectManager;
+import app.ProjectSystem;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -20,11 +21,12 @@ public class AddProjectManagerToProjectSteps {
     private ProjectManager projectManager;
     private String errorMessage;
     private Map<String, Employee> employees = new HashMap<>();
+    private ProjectSystem projectSystem = new ProjectSystem();
 
     @Given("a project {string} exists with no manager")
     public void aProjectExists(String projectName) {
-        LocalDate startDate = LocalDate.now();  // For example, using today's date
-        LocalDate endDate = LocalDate.now().plusMonths(6);  // For example, 6 months from now
+        LocalDate startDate = LocalDate.now();
+        LocalDate endDate = LocalDate.now().plusMonths(6);
         String projectId = "250001";  // Example project ID (you can generate this dynamically)
         project = new Project(projectName, projectId, startDate, endDate);
     }
@@ -96,7 +98,7 @@ public class AddProjectManagerToProjectSteps {
         try {
             // Try assigning project manager
             project.assignProjectManager(assigningEmployee, newManager);
-        } catch (IllegalStateException e) {
+        } catch (IllegalStateException e) { 
             errorMessage = e.getMessage();  // Catch the error message
         }
     }
@@ -116,4 +118,28 @@ public class AddProjectManagerToProjectSteps {
     public void shouldNowBeOfTheProjectManagerClass(String managerId) {
         assertTrue(project.getProjectManager() instanceof ProjectManager);  // Check the class type
     }
+
+    @When("{string} tries to assign the unregistered {string} as the project manager of {string}")
+    public void unregisteredAssignAsProjectManagerOf(String assigningEmployeeId, String newManagerId, String projectName) {
+        Employee assigningEmployee = employees.get(assigningEmployeeId);
+        if (assigningEmployee == null) {
+            assigningEmployee = new Employee(assigningEmployeeId);
+            employees.put(assigningEmployeeId, assigningEmployee);
+        }
+
+        Employee newManagerEmployee = employees.get(newManagerId);
+        if (newManagerEmployee == null) {
+            newManagerEmployee = new Employee(newManagerId);
+            employees.put(newManagerId, newManagerEmployee);
+        }
+
+        ProjectManager newManager = new ProjectManager(newManagerEmployee.getId());
+
+        try {
+            project.assignProjectManager(assigningEmployee, newManager);
+        } catch (IllegalStateException e) {
+            errorMessage = e.getMessage();
+        }
+    }
+
 }

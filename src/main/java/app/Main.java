@@ -16,6 +16,7 @@ public class Main {
 
     public static void main(String[] args) {
         projectSystem.registerEmployee("teem");
+        projectSystem.registerEmployee("paby");
         System.out.println("Welcome to the Project System Management for Softwarehuset A/S");
         while(true) {
             if (currentEmployee == null || !currentEmployee.loggedIn) {
@@ -24,14 +25,26 @@ public class Main {
             } else {
                 System.out.println("Type the number from the following options:");
                 System.out.println("2 - Create Project");
-                System.out.println("3 - Close Program");
+                System.out.println("3 - Add Employee to Project");
+                System.out.println("4 - Create Activity");
+                System.out.println("5 - Assign Employee to Activity");
+                System.out.println("6 - Register Time");
+                System.out.println("7 - Generate Project Report");
+                System.out.println("8 - Assign Project Manager");
+                System.out.println("9 - Exit");
             }
             String option = scanner.nextLine();
 
             switch (option) {
                 case "1" -> logIn();
                 case "2" -> createProject();
-                case "3" -> {
+                case "3" -> assignEmployeeToProject();
+                case "4" -> createActivity();
+                case "5" -> assignEmployeeToActivity();
+                case "6" -> registerTime();
+                case "7" -> generateProjectReport();
+                case "8" -> assignProjectManager();
+                case "9" -> {
                     System.out.println("Thank you for using Project System Mangement");
                     return;}
                 default -> System.out.println("Invalid option");
@@ -66,6 +79,60 @@ public class Main {
             System.out.println("Project " + project.getName() + " created successfully with id " + project.getId());
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
+        }
+    }
+
+    private static void addEmployeeToProject() {
+        System.out.println("Please enter project id");
+        return;
+    }
+
+    private static void createActivity() {
+        return;
+    }
+
+    private static void assignEmployeeToProject() {
+        return;
+    }
+
+    private static void assignEmployeeToActivity() {
+        return;
+    }
+
+    private static void generateProjectReport() {
+        return;
+    }
+
+    private static void registerTime() {
+        return;
+    }
+
+    private static void assignProjectManager() {
+        System.out.println("Assign Project Manager");
+        System.out.print("Enter project ID: ");
+        String projectId = scanner.nextLine().trim();
+
+        Project project = projectSystem.getProjectById(projectId);
+        if (project == null) {
+            System.out.println("❌ Project not found.");
+            return;
+        }
+
+        System.out.print("Enter ID of the employee to assign as project manager: ");
+        String managerId = scanner.nextLine().trim();
+
+        if (!projectSystem.isRegistered(managerId)) {
+            System.out.println("❌ Error: " + managerId + " is not registered as an employee.");
+            return;
+        }
+
+        ProjectManager newManager = new ProjectManager(managerId);
+
+        try {
+            project.assignProjectManager(currentEmployee, newManager);
+            System.out.println("✅ " + managerId + " is now project manager for " + project.getName());
+        } catch (IllegalStateException e) {
+            System.out.println("❌ Error: " + e.getMessage());
         }
     }
 }

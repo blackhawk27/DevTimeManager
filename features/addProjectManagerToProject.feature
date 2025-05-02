@@ -24,3 +24,8 @@ Feature: Add project manager to project
     When "E456" tries to assign "E456" as the project manager of "New Website"
     Then "E456" will get an error message "E456 is not assigned to the project and cannot assign a manager."
 
+  Scenario: Cannot assign non-employee as project manager
+    Given a project "New Website" exists with no manager
+    And an employee with id "E123" is assigned to "New Website"
+    When "E123" tries to assign the unregistered "non-employee" as the project manager of "New Website"
+    Then "E123" will get an error message "non-employee is not registered as an employee."

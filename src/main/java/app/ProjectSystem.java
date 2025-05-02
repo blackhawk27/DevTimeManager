@@ -25,7 +25,7 @@ public class ProjectSystem {
     }
 
     private String generateProjectID() {
-        String year = "25"; // 2025
+        String year = LocalDate.now().getYear()%100 + "";
         String id = year + String.format("%03d", projectCounter++);
         return id;
     }

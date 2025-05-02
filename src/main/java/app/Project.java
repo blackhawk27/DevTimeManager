@@ -66,22 +66,15 @@ public class Project {
     }
 
     public void assignProjectManager(Employee assigningEmployee, ProjectManager newManager) {
-        // NEW: ensure the acting employee is actually on this project
-        //if (!employees.contains(assigningEmployee)) {
-        //    throw new IllegalStateException(
-        //            assigningEmployee.getId()
-        //                    + " is not assigned to the project and cannot assign a manager."
-        //    );
-        //}
-        //if (this.projectManager != null) {
-        //    throw new IllegalStateException(
-        //            "This project already has a project manager. You cannot assign a new one."
-        //    );
         if (this.projectManager != null) {
             throw new IllegalStateException("This project already has a project manager. You cannot assign a new one.");
         }
         if (!employees.contains(assigningEmployee)) {
             throw new IllegalStateException(assigningEmployee.getId() + " is not assigned to the project and cannot assign a manager.");
+        }
+
+        if (!employees.stream().anyMatch(e -> e.getId().equals(newManager.getId()))) {
+            throw new IllegalStateException(newManager.getId() + " is not registered as an employee.");
         }
         // no manager yet → OK
         setProjectManager(newManager);
