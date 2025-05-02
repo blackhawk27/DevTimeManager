@@ -40,6 +40,10 @@ public class Project {
         activities.add(activity);
     }
 
+    public List<Employee> getEmployees() {
+        return new ArrayList<>(employees);
+    }
+
     public Activity getActivityByName(String activityName) {
         for (Activity activity : activities) {
             if (activity.getName().equals(activityName)) {

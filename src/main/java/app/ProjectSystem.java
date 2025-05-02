@@ -39,6 +39,48 @@ public class ProjectSystem {
         return null;
     }
 
+    /**
+     * Adds an employee to a project only.
+     */
+    public void addEmployee(String employeeId, String projectId) {
+        if (!isRegistered(employeeId)) {
+            throw new IllegalArgumentException("Employee with ID " + employeeId + " does not exist");
+        }
+
+        Project project = getProjectById(projectId);
+        if (project == null) {
+            throw new IllegalArgumentException("Project with ID " + projectId + " does not exist");
+        }
+
+        Employee employee = getEmployeeById(employeeId);
+
+        // Undgå at tilføje samme medarbejder flere gange
+        if (!project.getEmployees().contains(employee)) {
+            project.addEmployee(employee); // Projektet håndterer selv sin liste
+        }
+    }
+
+    /**
+     * Adds an employee to a project and an activity.
+     */
+    public void addEmployee(String employeeId, String projectId, String activityName) {
+        // Først sikre at medarbejderen er på projektet – uden duplikat
+        addEmployee(employeeId, projectId);
+
+        Project project = getProjectById(projectId);
+        Activity activity = project.getActivityByName(activityName);
+        if (activity == null) {
+            throw new IllegalArgumentException("Activity " + activityName + " not found in project " + projectId);
+        }
+
+        Employee employee = getEmployeeById(employeeId);
+
+        // Undgå at tilføje medarbejderen flere gange til samme aktivitet
+        if (!activity.isEmployeeAssigned(employee)) {
+            activity.assignEmployee(employee); // Aktiviteten håndterer sine egne regler (fx max 10 aktiviteter)
+        }
+    }
+
     public boolean isRegistered(String id) {
         return employees.containsKey(id);
     }

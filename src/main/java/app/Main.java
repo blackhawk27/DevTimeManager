@@ -92,11 +92,33 @@ public class Main {
     }
 
     private static void assignEmployeeToProject() {
-        return;
+        System.out.println("Enter project ID:");
+        String projectId = scanner.nextLine();
+        System.out.println("Enter employee ID to add:");
+        String employeeId = scanner.nextLine();
+
+        try {
+            projectSystem.addEmployee(employeeId, projectId);
+            System.out.println("Employee " + employeeId + " added to project " + projectId);
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+        }
     }
 
     private static void assignEmployeeToActivity() {
-        return;
+        System.out.println("Enter project ID:");
+        String projectId = scanner.nextLine();
+        System.out.println("Enter activity name:");
+        String activityName = scanner.nextLine();
+        System.out.println("Enter employee ID to assign:");
+        String employeeId = scanner.nextLine();
+
+        try {
+            projectSystem.addEmployee(employeeId, projectId, activityName);
+            System.out.println("Employee " + employeeId + " assigned to activity " + activityName + " in project " + projectId);
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+        }
     }
 
     private static void generateProjectReport() {
