@@ -9,6 +9,8 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -17,6 +19,7 @@ public class AddProjectManagerToProjectSteps {
     private Employee employee;
     private ProjectManager projectManager;
     private String errorMessage;
+    private Map<String, Employee> employees = new HashMap<>();
 
     @Given("a project {string} exists with no manager")
     public void aProjectExists(String projectName) {
@@ -28,7 +31,10 @@ public class AddProjectManagerToProjectSteps {
 
     @And("an employee with id {string} is assigned to {string}")
     public void anEmployeeWithIdIsAssignedTo(String employeeId, String projectName) {
-        employee = new Employee(employeeId);
+        //employee = new Employee(employeeId);
+        //project.addEmployee(employee);
+        Employee employee = new Employee(employeeId);
+        employees.put(employeeId, employee);
         project.addEmployee(employee);
     }
 
@@ -39,10 +45,17 @@ public class AddProjectManagerToProjectSteps {
 
     @When("{string} assigns {string} as project manager to {string}")
     public void assignsAsProjectManagerTo(String employeeId, String managerId, String projectName) {
-        employee = new Employee(employeeId);
-        projectManager = new ProjectManager(managerId);  // Create project manager
-        project.assignProjectManager(employee, projectManager);  // Assumes a method in Project class for this
+        //employee = new Employee(employeeId);
+        //projectManager = new ProjectManager(managerId);  // Create project manager
+        //project.assignProjectManager(employee, projectManager);  // Assumes a method in Project class for this
+        Employee assigningEmployee = employees.get(employeeId);
+        if (assigningEmployee == null) {
+            throw new IllegalStateException("Employee " + employeeId + " not found");
+        }
+        projectManager = new ProjectManager(managerId);
+        project.assignProjectManager(assigningEmployee, projectManager);
     }
+
 
 
     @Then("{string} should be able to see {string} in their list of managed projects")
