@@ -2,12 +2,14 @@ package hellocucumber;
 
 import app.Activity;
 import app.Project;
+import app.TimeEntry;
 import io.cucumber.java.PendingException;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,19 +40,31 @@ public class GenerateProjectReportSteps {
     @And("the total registered work time on {string} is {int} hours")
     public void theTotalRegisteredWorkTimeOnIsHours(String projectName, int registeredTime) {
         Project project = AddEmployeeSteps.projectSystem.getProjectByName(projectName);
-        if (project != null) {
-            Activity activity = project.getActivityByName("BudgetActivity");
-            if (activity != null) {
-                activity = new Activity("BudgetActivity");
-                project.addActivity(activity);
-            }
-            assert activity != null;
-            activity.setRegisteredTime(registeredTime);
-        } else {
-            throw new IllegalStateException("Project does not exist: ");
+        if (project == null) {
+            throw new IllegalStateException("Project does not exist: " + projectName);
         }
 
+        Activity activity = project.getActivityByName("BudgetActivity");
+        if (activity == null) {
+            activity = new Activity("BudgetActivity");
+            project.addActivity(activity);
+        }
+
+        // Simuler registreret arbejdstid via TimeEntries
+        for (int i = 0; i < registeredTime; i++) {
+            // F.eks. 1 time hver dag
+            LocalDateTime start = LocalDateTime.of(2025, 5, i + 1, 9, 0);
+            LocalDateTime end = start.plusHours(1);
+
+            TimeEntry entry = new TimeEntry(TimeEntry.EntryType.Work, start, end, projectName, "BudgetActivity");
+            activity.addWorkEntry(entry);
+        }
+
+        // Ekstra check
+        int actual = activity.getRegisteredTime();
+        assertEquals(registeredTime, actual, "Total work time mismatch");
     }
+
 
     @And("the project manager is logged in")
     public void theProjectManagerIsLoggedIn() {
