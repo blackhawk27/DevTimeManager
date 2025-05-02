@@ -53,10 +53,10 @@ public class Main {
     }
 
     private static void logIn() {
-        System.out.println("Please enter your employee id:");
+        System.out.println("Please enter your four letter employee ID:");
         String id = scanner.nextLine();
         if (!projectSystem.isRegistered(id)) {
-            System.out.println("Invalid employee id");
+            System.out.println("Invalid employee ID");
             return;
         } else {
             currentEmployee = projectSystem.getEmployeeById(id);
@@ -66,7 +66,7 @@ public class Main {
     }
     private static void createProject() {
         try {
-            System.out.println("Please enter your project name:");
+            System.out.println("Please enter your project name (ex. Greg's Website):");
             String projectName = scanner.nextLine();
             currentEmployee.inputProjectName(projectName);
             System.out.println("Please enter start date (dd/mm/yyyy):");
@@ -83,7 +83,7 @@ public class Main {
     }
 
     private static void addEmployeeToProject() {
-        System.out.println("Please enter project id");
+        System.out.println("Please enter project ID");
         return;
     }
 
@@ -131,12 +131,12 @@ public class Main {
 
     private static void assignProjectManager() {
         System.out.println("Assign Project Manager");
-        System.out.print("Enter project ID: ");
+        System.out.print("Enter project ID (ex. 25001): ");
         String projectId = scanner.nextLine().trim();
 
         Project project = projectSystem.getProjectById(projectId);
         if (project == null) {
-            System.out.println("❌ Project not found.");
+            System.out.println("Project not found.");
             return;
         }
 
@@ -144,7 +144,7 @@ public class Main {
         String managerId = scanner.nextLine().trim();
 
         if (!projectSystem.isRegistered(managerId)) {
-            System.out.println("❌ Error: " + managerId + " is not registered as an employee.");
+            System.out.println("Error: " + managerId + " is not registered as an employee.");
             return;
         }
 
@@ -152,9 +152,9 @@ public class Main {
 
         try {
             project.assignProjectManager(currentEmployee, newManager);
-            System.out.println("✅ " + managerId + " is now project manager for " + project.getName());
+            System.out.println(managerId + " is now project manager for " + project.getName());
         } catch (IllegalStateException e) {
-            System.out.println("❌ Error: " + e.getMessage());
+            System.out.println("Error: " + e.getMessage());
         }
     }
 }
