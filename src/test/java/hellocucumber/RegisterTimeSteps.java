@@ -23,10 +23,10 @@ public class RegisterTimeSteps {
     private LocalDate sickLeaveStart;
     private LocalDate sickLeaveEnd;
 
-    @Given("an employee with id {string} is logged in")
-    public void anEmployeeWithIdIsLoggedIn(String employeeId) {
-        this.loggedInEmployeeId = employeeId;
-    }
+    //@Given("an employee with id {string} is logged in")
+    //public void anEmployeeWithIdIsLoggedIn(String employeeId) {
+    //    this.loggedInEmployeeId = employeeId;
+    //}
 
 
     @And("that the employee is assigned to an {string} under {string}")

@@ -11,8 +11,8 @@ import java.time.format.DateTimeFormatter;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class CreateProjectSteps {
+    public static app.ProjectSystem projectSystem = new app.ProjectSystem();
     private Employee employee;
-    private ProjectSystem projectSystem;
     private Project createdProject;
     private String errorMessage;
 

@@ -2,7 +2,7 @@ Feature: Generate project report
   Description: A project manager creates a report with a given budget time
   Actors: Project manager
 
-  Scenario: Successfully generating a report
+  Scenario: Successfully generating a report 
     Given a project "ProjectX" exists
     And "ProjectX" has a budgeted time of 100 hours
     And the total registered work time on "ProjectX" is 75 hours

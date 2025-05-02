@@ -7,6 +7,9 @@ public class Activity {
     private final String name;
     private final List<Employee> assignedEmployees = new ArrayList<>();
 
+    private int budgetedTime = 0;
+    private int registeredTime = 0;
+
     public Activity(String name) {
         this.name = name;
     }
@@ -31,4 +34,19 @@ public class Activity {
     }
 
 
+    public void setBudgetedTime(int budgetedTime) {
+        this.budgetedTime = budgetedTime;
+    }
+
+    public void setRegisteredTime(int registeredTime) {
+        this.registeredTime = registeredTime;
+    }
+
+    public int getRegisteredTime() {
+        return registeredTime;
+    }
+
+    public int getBudgetedTime() {
+        return budgetedTime;
+    }
 }

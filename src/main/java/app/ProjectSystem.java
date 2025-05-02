@@ -26,6 +26,19 @@ public class ProjectSystem {
         String id = year + String.format("%03d", projectCounter++);
         return id;
     }
+
+    public Project getProjectByName(String name) {
+        for (Project project : projects) {
+            if (project.getName().equals(name)) {
+                return project;
+            }
+        }
+        return null;
+    }
+
+    public void removeProjectByName(String projectName) {
+        projects.removeIf(project -> project.getName().equals(projectName));
+    }
 }
 
 
