@@ -17,12 +17,12 @@ Feature: Register time
 
   Scenario: Registering free time
     Given an employee with id "E123" is logged in
-    When the employee registers free time from day "2025-03-31" up to and including "2025-04-02"
+    When the employee registers free time from day "31/03/2025" up to and including "02/04/2025"
     Then the employee has 3 days of free time
 
   Scenario: Register sick leave despite have registered work time
     Given an employee with id "E123" is logged in
-    And the employee has registered work time on "ActivityX" under "ProjectY" on "2025-03-31"
-    And the employee want to update the existing registration on "2025-03-31"
-    When the employee updates the registration to sick leave and gives an end date on "2025-04-02"
-    Then the time in period "2025-03-31" up to and including "2025-04-02" is updated as sick leave
+    And the employee has registered work time on "ActivityX" under "ProjectY" on "31/03/2025"
+    And the employee want to update the existing registration on "31/03/2025"
+    When the employee updates the registration to sick leave and gives an end date on "02/04/2025"
+    Then the time in period "31/03/2025" up to and including "02/04/2025" is updated as sick leave

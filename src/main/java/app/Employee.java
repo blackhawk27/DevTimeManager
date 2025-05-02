@@ -13,6 +13,9 @@ public class Employee {
     private LocalDate tempStartDate;
     private LocalDate tempEndDate;
     private int assignedActivitiesCount = 0;
+    private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy-HH:mm");
+    private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
 
     private final List<TimeEntry> timeRegistry = new ArrayList<>();
 
@@ -167,19 +170,21 @@ public class Employee {
         }
     }
 
+
     private LocalDateTime parseDateTime(String input) {
         try {
-            return LocalDateTime.parse(input, DateTimeFormatter.ofPattern("yyyy-MM-dd-HH:mm"));
+            return LocalDateTime.parse(input, dateTimeFormatter);
         } catch (Exception e) {
-            throw new IllegalArgumentException("Invalid datetime format");
+            throw new IllegalArgumentException("Invalid datetime format (dd/MM/yyyy-HH:mm)");
         }
     }
 
     private LocalDate parseDate(String input) {
         try {
-            return LocalDate.parse(input);
+            return LocalDate.parse(input, dateFormatter);
         } catch (Exception e) {
-            throw new IllegalArgumentException("Invalid date format");
+            throw new IllegalArgumentException("Invalid date format (dd/MM/yyyy)");
         }
     }
+
 }

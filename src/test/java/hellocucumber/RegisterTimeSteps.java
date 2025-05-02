@@ -5,6 +5,7 @@ import io.cucumber.java.en.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,14 +20,15 @@ public class RegisterTimeSteps {
     private String errorMessage;
     private int calculatedWorkHours;
 
+    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
     @Given("an employee with id {string} is logged in")
     public void anEmployeeWithIdIsLoggedIn(String id) {
         projectSystem = new ProjectSystem();
         employee = new Employee(id);
         employee.logIn();
 
-        // Opret projekt og aktivitet én gang til alle scenarier
-        project = projectSystem.createProject("ProjectY", java.time.LocalDate.now(), java.time.LocalDate.now().plusDays(30));
+        project = projectSystem.createProject("ProjectY", LocalDate.now(), LocalDate.now().plusDays(30));
         activity = new Activity("ActivityX");
         project.addActivity(activity);
         project.addEmployee(employee);
@@ -38,11 +40,10 @@ public class RegisterTimeSteps {
         // Foruddefineret i Given ovenfor – ingen handling nødvendig her
     }
 
-
     @When("the employee registers in the system that he started to work on {string} under {string} at {string} and stopped at {string}")
     public void theEmployeeRegistersInTheSystemThatHeStartedToWork(String activityName, String projectName, String startTime, String endTime) {
         ArrayList<String> date = new ArrayList<>();
-        String today = java.time.LocalDate.now().toString();
+        String today = LocalDate.now().format(DATE_FORMAT);
         date.add(today + "-" + startTime);
         date.add(today + "-" + endTime);
         try {
@@ -51,7 +52,6 @@ public class RegisterTimeSteps {
             errorMessage = e.getMessage();
         }
     }
-
 
     @Then("the employee has worked {int} hours on {string} under {string}")
     public void theEmployeeHasWorkedHoursOnUnder(int expectedHours, String activityName, String projectName) {
@@ -62,7 +62,7 @@ public class RegisterTimeSteps {
     @When("the employee later corrects time spent in the system to say he started to work on {string} under {string} at {string} and stopped at {string}")
     public void theEmployeeLaterCorrectsTimeSpent(String activityName, String projectName, String correctedStart, String correctedEnd) {
         ArrayList<String> date = new ArrayList<>();
-        String today = java.time.LocalDate.now().toString();
+        String today = LocalDate.now().format(DATE_FORMAT);
         date.add(today + "-" + correctedStart);
         date.add(today + "-" + correctedEnd);
         try {
@@ -113,14 +113,14 @@ public class RegisterTimeSteps {
 
     @And("the employee want to update the existing registration on {string}")
     public void theEmployeeWantToUpdateTheExistingRegistrationOn(String start) {
-        // Gemmes i næste step – no-op
+        // No-op
     }
 
     @When("the employee updates the registration to sick leave and gives an end date on {string}")
     public void theEmployeeUpdatesTheRegistrationToSickLeave(String end) {
         String start = employee.getTimeRegistry().stream()
                 .filter(e -> e.getType() == TimeEntry.EntryType.Work)
-                .map(e -> e.getStartDateTime().toLocalDate().toString())
+                .map(e -> e.getStartDateTime().toLocalDate().format(DATE_FORMAT))
                 .findFirst().orElseThrow();
 
         ArrayList<String> date = new ArrayList<>();
@@ -135,8 +135,8 @@ public class RegisterTimeSteps {
 
     @Then("the time in period {string} up to and including {string} is updated as sick leave")
     public void theTimeInPeriodIsUpdatedAsSickLeave(String start, String end) {
-        LocalDate s = LocalDate.parse(start);
-        LocalDate e = LocalDate.parse(end);
+        LocalDate s = LocalDate.parse(start, DATE_FORMAT);
+        LocalDate e = LocalDate.parse(end, DATE_FORMAT);
         List<LocalDate> dates = new ArrayList<>();
         for (LocalDate d = s; !d.isAfter(e); d = d.plusDays(1)) {
             dates.add(d);

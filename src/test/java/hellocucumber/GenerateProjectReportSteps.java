@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 public class GenerateProjectReportSteps {
-    //private  Map<String, Project> projects = new HashMap<String, Project>();
+    //private Map<String, Project> projects = new HashMap<String, Project>();
     private Project currentReport;
     private String loggedInUserRole;
     private String errorMessage;
@@ -51,20 +51,19 @@ public class GenerateProjectReportSteps {
             project.addActivity(activity);
         }
 
-        // Simuler registreret arbejdstid via TimeEntries
+        LocalDate baseDate = LocalDate.of(2025, 5, 1);
         for (int i = 0; i < registeredTime; i++) {
-            // F.eks. 1 time hver dag
-            LocalDateTime start = LocalDateTime.of(2025, 5, i + 1, 9, 0);
+            LocalDateTime start = baseDate.plusDays(i).atTime(9, 0);
             LocalDateTime end = start.plusHours(1);
 
             TimeEntry entry = new TimeEntry(TimeEntry.EntryType.Work, start, end, projectName, "BudgetActivity");
             activity.addWorkEntry(entry);
         }
 
-        // Ekstra check
         int actual = activity.getRegisteredTime();
         assertEquals(registeredTime, actual, "Total work time mismatch");
     }
+
 
 
     @And("the project manager is logged in")
