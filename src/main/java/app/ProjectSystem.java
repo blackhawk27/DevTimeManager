@@ -2,11 +2,14 @@ package app;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ProjectSystem {
     private int projectCounter = 1;
     private List<Project> projects = new ArrayList<>();
+    private Map<String, Employee> employees = new HashMap<>();
 
 
     public ProjectSystem() {
@@ -34,6 +37,18 @@ public class ProjectSystem {
             }
         }
         return null;
+    }
+
+    public boolean isRegistered(String id) {
+        return employees.containsKey(id);
+    }
+
+    public void registerEmployee(String id){
+        employees.put(id ,new Employee(id));
+    }
+
+    public Employee getEmployeeById(String id) {
+        return employees.get(id);
     }
 
     public void removeProjectByName(String projectName) {
