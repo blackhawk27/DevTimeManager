@@ -1,94 +1,106 @@
 package hellocucumber;
 
-import app.Activity;
-import app.Employee;
-import app.Project;
-import app.ProjectSystem;
-import io.cucumber.java.en.And;
-import io.cucumber.java.en.Given;
-import io.cucumber.java.en.Then;
-import io.cucumber.java.en.When;
+import app.*;
+import io.cucumber.java.en.*;
 
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Map;
+import java.time.format.DateTimeFormatter;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-
 public class AddEmployeeSteps {
-
+    public static final ProjectSystem projectSystem = new ProjectSystem();
     private Project project;
     private Activity activity;
     private Employee employee;
     private String errorMessage;
 
-    public static final Map<String, Project> sharedProjects = new HashMap<>();
-    public static final ProjectSystem projectSystem = new ProjectSystem();
+    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     @Given("a project {string} exists")
     public void aProjectExists(String projectName) {
-        if (projectSystem.getProjectByName(projectName) == null) {
-            projectSystem.createProject(
-                    projectName,
-                    LocalDate.now(),
-                    LocalDate.now().plusMonths(6)
-            );
+        project = projectSystem.getProjectByName(projectName);
+        if (project == null) {
+            project = projectSystem.createProject(projectName, LocalDate.now(), LocalDate.now().plusDays(30));
         }
     }
 
-
-    @And("an activity {string} exists in {string}")
-    public void anActivityExistsIn(String activityName, String projectName) {
-        //activity = new Activity(activityName);
-        //project.addActivity(activity);
-        Project project = projectSystem.getProjectByName(projectName);
-        if (project != null) {
-            activity = new Activity(activityName);  //
-            project.addActivity(activity);
-        } else {
-            throw new IllegalArgumentException("Project " + projectName + " does not exist");
+    @And("an activity with ID {string}, name {string}, start date {string} and end date {string} exists in {string}")
+    public void anActivityExists(String id, String name, String startDate, String endDate, String projectName) {
+        LocalDate start = LocalDate.parse(startDate, DATE_FORMAT);
+        LocalDate end = LocalDate.parse(endDate, DATE_FORMAT);
+        Project targetProject = projectSystem.getProjectByName(projectName);
+        activity = new Activity(id, name, start, end);
+        try {
+            targetProject.addActivity(activity);
+        } catch (Exception e) {
+            errorMessage = e.getMessage();
         }
     }
 
     @And("an employee with id {string} exists")
     public void anEmployeeExists(String id) {
-        employee = new Employee(id);
+        employee = projectSystem.getEmployeeById(id);
+        if (employee == null) {
+            employee = new Employee(id);
+            employee.logIn();
+            projectSystem.registerEmployee(id);
+        }
     }
+
+    @And("{string} is already assigned to 10 activities")
+    @And("{string} is already assigned to 10 other activities")
+    public void employeeIsAssignedTo10Activities(String empId) {
+        Employee emp = AddEmployeeSteps.projectSystem.getEmployeeById(empId);
+        if (emp == null) {
+            emp = new Employee(empId);
+            emp.logIn();
+            AddEmployeeSteps.projectSystem.registerEmployee(empId);
+        }
+        for (int i = 0; i < 10; i++) {
+            Activity dummy = new Activity("D" + i, "Dummy" + i, LocalDate.now(), LocalDate.now().plusDays(5));
+            dummy.assignEmployee(emp);
+        }
+    }
+
+
+
+    @And("{string} is already assigned to {string}")
+    public void employeeIsAlreadyAssignedToActivity(String empId, String activityName) {
+        Activity act = project.getActivityByName(activityName);
+        Employee emp = projectSystem.getEmployeeById(empId);
+        if (!act.isEmployeeAssigned(emp)) {
+            act.assignEmployee(emp);
+        }
+    }
+
 
     @When("{string} is assigned to {string}")
-    public void isAssignedTo(String id, String activityName) {
+    public void assignEmployeeToActivity(String empId, String activityName) {
+        Activity act = project.getActivityByName(activityName);
+        Employee emp = projectSystem.getEmployeeById(empId);
         try {
-            activity.assignEmployee(employee);
-        } catch (Exception e) {
-            errorMessage = e.getMessage(); // save the error to verify later
-        }
-    }
-
-    @Then("{string} should be listed in the employee list for {string}")
-    public void shouldBeListedInTheEmployeeListFor(String id, String activityName) {
-        assertTrue(activity.isEmployeeAssigned(employee));
-    }
-
-    @And("{string} is already assigned to {int} activities")
-    public void isAlreadyAssignedToActivities(String id, int activityCount) {
-        for (int i=0 ; i<activityCount ; i++) {
-            Activity dummyActivity = new Activity("Dummy activity" + i);
-            dummyActivity.assignEmployee(employee);
-        }
-    }
-
-    @Then("the system should return an error message {string}")
-    public void theSystemShouldReturnAnErrorMessage(String expectedMessage) {
-        assertEquals(expectedMessage, errorMessage);
-    }
-
-    @When("{string} is assigned to {string} again")
-    public void isAssignedToAgain(String id, String activityName) {
-        try {
-            activity.assignEmployee(employee);
+            act.assignEmployee(emp);
         } catch (Exception e) {
             errorMessage = e.getMessage();
         }
+    }
+
+
+    @When("{string} is assigned to {string} again")
+    public void assignToActivityAgain(String empId, String activityName) {
+        assignEmployeeToActivity(empId, activityName);
+    }
+
+    @Then("{string} should be listed in the employee list for {string}")
+    public void shouldBeListed(String empId, String activityName) {
+        Activity act = project.getActivityByName(activityName);
+        Employee emp = projectSystem.getEmployeeById(empId);
+        assertTrue(act.isEmployeeAssigned(emp));
+    }
+
+    @Then("the system should return an error message {string}")
+    public void shouldReturnError(String expectedMessage) {
+        assertEquals(expectedMessage, errorMessage);
     }
 }

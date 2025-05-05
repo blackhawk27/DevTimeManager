@@ -1,21 +1,40 @@
 package app;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
 public class Activity {
+    private final String id;
     private final String name;
+    private final LocalDate startDate;
+    private final LocalDate endDate;
     private final List<Employee> assignedEmployees = new ArrayList<>();
     private final List<TimeEntry> workEntries = new ArrayList<>();
     private int budgetedTime = 0;
 
-    public Activity(String name) {
+    public Activity(String id, String name, LocalDate startDate, LocalDate endDate) {
+        this.id = id;
         this.name = name;
+        this.startDate = startDate;
+        this.endDate = endDate;
+    }
+
+    public String getId() {
+        return id;
     }
 
     public String getName() {
         return name;
+    }
+
+    public LocalDate getStartDate() {
+        return startDate;
+    }
+
+    public LocalDate getEndDate() {
+        return endDate;
     }
 
     public void assignEmployee(Employee employee) {
@@ -55,11 +74,10 @@ public class Activity {
     }
 
     public List<TimeEntry> getWorkEntries() {
-        return new ArrayList<>(workEntries); // beskyt mod ekstern mutation
+        return new ArrayList<>(workEntries);
     }
 
     public void removeWorkEntryIf(Predicate<TimeEntry> predicate) {
         workEntries.removeIf(predicate);
     }
-
 }

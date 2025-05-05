@@ -1,207 +1,166 @@
 package hellocucumber;
 
-import app.Activity;
-import app.Employee;
-import app.Project;
-import app.TimeEntry;
-import io.cucumber.java.PendingException;
-import io.cucumber.java.en.And;
-import io.cucumber.java.en.Given;
-import io.cucumber.java.en.Then;
-import io.cucumber.java.en.When;
+import app.*;
+import io.cucumber.java.en.*;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
+import java.time.format.DateTimeFormatter;
+import java.util.stream.IntStream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
+import static org.junit.jupiter.api.Assertions.*;
 
 public class GenerateProjectReportSteps {
-    //private Map<String, Project> projects = new HashMap<String, Project>();
+    private final ProjectSystem projectSystem = AddEmployeeSteps.projectSystem;
     private Project currentReport;
-    private String loggedInUserRole;
     private String errorMessage;
 
-    @And("{string} has a budgeted time of {int} hours")
-    public void hasABudgetedTimeOfHours(String projectName, int budgetedTime) {
-        Project project = AddEmployeeSteps.projectSystem.getProjectByName(projectName);
-        if (project != null) {
-            Activity budgetActivity = new Activity("BudgetActivity");
-            budgetActivity.setBudgetedTime(budgetedTime);
-            project.addActivity(budgetActivity);
-        } else {
-            throw new IllegalStateException("Project does not exist: '" + projectName + "'");
-        }
-
-
+    private LocalDate parseDate(String dateStr) {
+        return LocalDate.parse(dateStr, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
     }
 
-    @And("the total registered work time on {string} is {int} hours")
-    public void theTotalRegisteredWorkTimeOnIsHours(String projectName, int registeredTime) {
-        Project project = AddEmployeeSteps.projectSystem.getProjectByName(projectName);
-        if (project == null) {
-            throw new IllegalStateException("Project does not exist: " + projectName);
+    @Given("a project with the title {string} exists")
+    public void aProjectWithTitleExists(String projectName) {
+        if (projectSystem.getProjectByName(projectName) == null) {
+            projectSystem.createProject(projectName, LocalDate.now(), LocalDate.now().plusDays(30));
         }
+    }
 
-        Activity activity = project.getActivityByName("BudgetActivity");
-        if (activity == null) {
-            activity = new Activity("BudgetActivity");
-            project.addActivity(activity);
+
+    @And("employee {string} has logged in to manage activities")
+    public void employeeHasLoggedIn(String id) {
+        Employee emp = projectSystem.getEmployeeById(id);
+        if (emp == null) {
+            emp = new Employee(id);
+            projectSystem.registerEmployee(id);
         }
+        emp.logIn();
+    }
 
-        LocalDate baseDate = LocalDate.of(2025, 5, 1);
-        for (int i = 0; i < registeredTime; i++) {
-            LocalDateTime start = baseDate.plusDays(i).atTime(9, 0);
+    @And("a new activity with ID {string} name {string} start date {string} and end date {string} is added to the project {string}")
+    public void newActivityWithDatesAdded(String id, String name, String start, String end, String projectName) {
+        LocalDate startDate = parseDate(start);
+        LocalDate endDate = parseDate(end);
+        Project project = projectSystem.getProjectByName(projectName);
+        if (startDate.isAfter(endDate)) {
+            errorMessage = "End date cannot be before start date";
+            return;
+        }
+        if (project.getActivityByName(name) != null) {
+            errorMessage = "Activity with name '" + name + "' already exists in project '" + projectName + "'";
+            return;
+        }
+        Activity activity = new Activity(id, name, startDate, endDate);
+        project.addActivity(activity);
+    }
+
+    @And("{string} in {string} has a budgeted time of {int} hours")
+    public void activityHasBudgetedTime(String activityName, String projectName, int hours) {
+        Project project = projectSystem.getProjectByName(projectName);
+        Activity activity = project.getActivityByName(activityName);
+        activity.setBudgetedTime(hours);
+    }
+
+    @And("{int} hours of work are registered on activity {string} in {string}")
+    public void registerHoursOfWork(int hours, String activityName, String projectName) {
+        Project project = projectSystem.getProjectByName(projectName);
+        Activity activity = project.getActivityByName(activityName);
+        IntStream.range(0, hours).forEach(i -> {
+            LocalDateTime start = LocalDateTime.of(2025, 5, 1 + i, 9, 0);
             LocalDateTime end = start.plusHours(1);
-
-            TimeEntry entry = new TimeEntry(TimeEntry.EntryType.Work, start, end, projectName, "BudgetActivity");
+            TimeEntry entry = new TimeEntry(TimeEntry.EntryType.Work, start, end, projectName, activityName);
             activity.addWorkEntry(entry);
-        }
-
-        int actual = activity.getRegisteredTime();
-        assertEquals(registeredTime, actual, "Total work time mismatch");
+        });
     }
 
-
-
-    @And("the project manager is logged in")
-    public void theProjectManagerIsLoggedIn() {
-        Employee projectManager = new Employee("E123");
-        projectManager.logIn();
+    @And("no hours have been registered on {string}")
+    public void noHoursHaveBeenRegistered(String projectName) {
+        Project project = projectSystem.getProjectByName(projectName);
+        Activity activity = project.getActivityByName("BudgetActivity");
+        assertEquals(0, activity.getRegisteredTime());
     }
 
     @When("the project manager generates a report for {string}")
-    public void theProjectManagerGeneratesAReportFor(String projectName) {
-        currentReport = AddEmployeeSteps.projectSystem.getProjectByName(projectName);
+    public void projectManagerGeneratesReport(String projectName) {
+        currentReport = projectSystem.getProjectByName(projectName);
         if (currentReport == null) {
-            throw new IllegalStateException("Project does not exist: " + projectName);
+            errorMessage = "Project not found";
         }
     }
 
     @Then("the system displays the total registered hours as {int}")
-    public void theSystemDisplaysTheTotalRegisteredHoursAs(int arg0) {
-        int totalRegistered = currentReport.getActivities().stream()
-                .mapToInt(Activity::getRegisteredTime)
-                .sum();
-        assertEquals(arg0, totalRegistered, "Registered hours mismatch");
+    public void systemDisplaysTotalRegisteredHours(int expected) {
+        int actual = currentReport.getActivities().stream().mapToInt(Activity::getRegisteredTime).sum();
+        assertEquals(expected, actual);
     }
 
     @And("the system displays the budgeted time as {int}")
-    public void theSystemDisplaysTheBudgetedTimeAs(int arg0) {
-        int totalBudget = currentReport.getActivities().stream()
-                .mapToInt(Activity::getBudgetedTime)
-                .sum();
-        assertEquals(arg0, totalBudget, "Budgeted time mismatch");
+    public void systemDisplaysBudgetedTime(int expected) {
+        int actual = currentReport.getActivities().stream().mapToInt(Activity::getBudgetedTime).sum();
+        assertEquals(expected, actual);
     }
 
     @And("the system displays the unallocated hours as {int}")
-    public void theSystemDisplaysTheUnallocatedHoursAs(int arg0) {
-        int totalBudget = currentReport.getActivities().stream()
-                .mapToInt(Activity::getBudgetedTime)
-                .sum();
-        int totalRegistered = currentReport.getActivities().stream()
-                .mapToInt(Activity::getRegisteredTime)
-                .sum();
-        int unallocated = totalBudget - totalRegistered;
-        assertEquals(arg0, unallocated, "Unallocated hours mismatch");
+    public void systemDisplaysUnallocatedHours(int expected) {
+        int budget = currentReport.getActivities().stream().mapToInt(Activity::getBudgetedTime).sum();
+        int registered = currentReport.getActivities().stream().mapToInt(Activity::getRegisteredTime).sum();
+        assertEquals(expected, budget - registered);
     }
 
     @And("the system confirms that the project is within budget")
-    public void theSystemConfirmsThatTheProjectIsWithinBudget() {
-        int totalBudget = currentReport.getActivities().stream()
-                .mapToInt(Activity::getBudgetedTime)
-                .sum();
-        int totalRegistered = currentReport.getActivities().stream()
-                .mapToInt(Activity::getRegisteredTime)
-                .sum();
-        assertTrue(totalRegistered <= totalBudget, "Project is over budget!");
+    public void systemConfirmsProjectWithinBudget() {
+        int budget = currentReport.getActivities().stream().mapToInt(Activity::getBudgetedTime).sum();
+        int registered = currentReport.getActivities().stream().mapToInt(Activity::getRegisteredTime).sum();
+        assertTrue(registered <= budget);
     }
 
     @And("the system displays the estimated remaining work time")
-    public void theSystemDisplaysTheEstimatedRemainingWorkTime() {
-        int totalBudget = currentReport.getActivities().stream()
-                .mapToInt(Activity::getBudgetedTime)
-                .sum();
-        int totalRegistered = currentReport.getActivities().stream()
-                .mapToInt(Activity::getRegisteredTime)
-                .sum();
-        int remaining = totalBudget - totalRegistered;
-        assertTrue(remaining >= 0, "Remaining work time is negative!");
-    }
-
-    @And("no hours have been registered on {string}")
-    public void noHoursHaveBeenRegisteredOn(String projectName) {
-        Project project = AddEmployeeSteps.projectSystem.getProjectByName(projectName);
-        Activity activity = project.getActivityByName("BudgetActivity");
-        if (activity == null) {
-            throw new IllegalStateException("BudgetActivity findes ikke i projektet: '" + projectName + "'");
-        }
-        assertEquals(0, activity.getRegisteredTime(), "Expected no hours to be registered yet.");
+    public void systemDisplaysRemainingTime() {
+        int budget = currentReport.getActivities().stream().mapToInt(Activity::getBudgetedTime).sum();
+        int registered = currentReport.getActivities().stream().mapToInt(Activity::getRegisteredTime).sum();
+        int remaining = budget - registered;
+        assertTrue(remaining >= 0);
     }
 
     @And("the system warns {string}")
-    public void theSystemWarns(String expectedWarning) {
-        int totalRegistered = currentReport.getActivities().stream()
-                .mapToInt(Activity::getRegisteredTime)
-                .sum();
-        if (totalRegistered == 0) {
-            String actualWarning = "No work has been registered on this project yet";
-            assertEquals(actualWarning, expectedWarning, "Warning message mismatch");
+    public void systemWarns(String expectedWarning) {
+        int registered = currentReport.getActivities().stream().mapToInt(Activity::getRegisteredTime).sum();
+        if (registered == 0) {
+            assertEquals(expectedWarning, "No work has been registered on this project yet");
         } else {
-            throw new IllegalStateException("Expected a warning because no work was registered, but work was found.");
+            fail("Work was registered, but warning was expected");
         }
     }
 
     @Given("no project named {string} exists")
-    public void noProjectNamedExists(String projectName) {
-        Project project = AddEmployeeSteps.projectSystem.getProjectByName(projectName);
-        if (project != null) {
-            AddEmployeeSteps.projectSystem.removeProjectByName(projectName);
+    public void noProjectExists(String projectName) {
+        if (projectSystem.getProjectByName(projectName) != null) {
+            projectSystem.removeProjectByName(projectName);
         }
     }
 
     @When("the project manager attempts to generate a report for {string}")
-    public void theProjectManagerAttemptsToGenerateAReportFor(String projectName) {
-        currentReport = AddEmployeeSteps.projectSystem.getProjectByName(projectName);
+    public void managerAttemptsReportOnMissingProject(String projectName) {
+        currentReport = projectSystem.getProjectByName(projectName);
         if (currentReport == null) {
             errorMessage = "Project not found";
         }
     }
 
     @Then("the system displays an error message {string}")
-    public void theSystemDisplaysAnErrorMessage(String expectedMessage) {
-        if (currentReport == null) {
-            // Projektet findes ikke
-            assertEquals(expectedMessage, errorMessage, "Error message mismatch (project not found case)");
-        } else {
-            // Projektet findes men måske uden budget
-            int totalBudget = currentReport.getActivities().stream()
-                    .mapToInt(Activity::getBudgetedTime)
-                    .sum();
-            if (totalBudget == 0) {
-                errorMessage = "Budgeted time is missing for this project";
-            } else {
-                errorMessage = null;
-            }
-            assertEquals(expectedMessage, errorMessage, "Error message mismatch (budget missing case)");
-        }
+    public void systemDisplaysError(String expected) {
+        assertEquals(expected, errorMessage);
     }
 
     @And("{string} has no budgeted time set")
-    public void hasNoBudgetedTimeSet(String projectName) {
-        Project project = AddEmployeeSteps.projectSystem.getProjectByName(projectName);
-        if (project != null) {
-            Activity budgetActivity = new Activity("BudgetActivity");
-            project.addActivity(budgetActivity);
-        } else {
-            throw new IllegalStateException("Project does not exist: " + projectName);
-        }
+    public void noBudgetTime(String projectName) {
+        Project project = projectSystem.getProjectByName(projectName);
+        Activity activity = new Activity("NB1", "BudgetActivity", LocalDate.now(), LocalDate.now().plusDays(10));
+        project.addActivity(activity);
     }
 
     @When("the project manager attempts to generate a report without selecting a project")
-    public void theProjectManagerAttemptsToGenerateAReportWithoutSelectingAProject() {
+    public void managerAttemptsWithoutProject() {
         currentReport = null;
         errorMessage = "No project selected";
     }

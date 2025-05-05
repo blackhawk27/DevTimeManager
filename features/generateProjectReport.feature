@@ -2,11 +2,12 @@ Feature: Generate project report
   Description: A project manager creates a report with a given budget time
   Actors: Project manager
 
-  Scenario: Successfully generating a report 
-    Given a project "ProjectX" exists
-    And "ProjectX" has a budgeted time of 100 hours
-    And the total registered work time on "ProjectX" is 75 hours
-    And the project manager is logged in
+  Scenario: Successfully generating a report
+    Given a project with the title "ProjectX" exists
+    And employee "E123" has logged in to manage activities
+    And a new activity with ID "BUDX" name "BudgetActivity" start date "01/05/2025" and end date "31/05/2025" is added to the project "ProjectX"
+    And "BudgetActivity" in "ProjectX" has a budgeted time of 100 hours
+    And 75 hours of work are registered on activity "BudgetActivity" in "ProjectX"
     When the project manager generates a report for "ProjectX"
     Then the system displays the total registered hours as 75
     And the system displays the budgeted time as 100
@@ -15,10 +16,11 @@ Feature: Generate project report
     And the system displays the estimated remaining work time
 
   Scenario: Generating a report for a project with no registered work time
-    Given a project "ProjectY" exists
-    And "ProjectY" has a budgeted time of 50 hours
+    Given a project with the title "ProjectX" exists
+    And employee "E123" has logged in to manage activities
+    And a new activity with ID "BUDY" name "BudgetActivity" start date "01/05/2025" and end date "31/05/2025" is added to the project "ProjectY"
+    And "BudgetActivity" in "ProjectY" has a budgeted time of 50 hours
     And no hours have been registered on "ProjectY"
-    And the project manager is logged in
     When the project manager generates a report for "ProjectY"
     Then the system displays the total registered hours as 0
     And the system displays the budgeted time as 50
@@ -26,19 +28,19 @@ Feature: Generate project report
 
   Scenario: Generating a report for a non-existent project
     Given no project named "NonExistingProject" exists
-    And the project manager is logged in
+    And employee "E123" has logged in to manage activities
     When the project manager attempts to generate a report for "NonExistingProject"
     Then the system displays an error message "Project not found"
 
   Scenario: Generating a report when budgeted time is not set
-    Given a project "ProjectZ" exists
-    And "ProjectZ" has no budgeted time set
-    And the total registered work time on "ProjectZ" is 10 hours
-    And the project manager is logged in
+    Given a project with the title "ProjectZ" exists
+    And employee "E123" has logged in to manage activities
+    And a new activity with ID "BUDZ" name "BudgetActivity" start date "01/05/2025" and end date "31/05/2025" is added to the project "ProjectZ"
+    And 10 hours of work are registered on activity "BudgetActivity" in "ProjectZ"
     When the project manager generates a report for "ProjectZ"
     Then the system displays an error message "Budgeted time is missing for this project"
 
   Scenario: Generating a report when no project is selected
-    Given the project manager is logged in
+    Given employee "E123" has logged in to manage activities
     When the project manager attempts to generate a report without selecting a project
     Then the system displays an error message "No project selected"
