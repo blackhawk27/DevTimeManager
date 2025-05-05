@@ -2,10 +2,11 @@ package hellocucumber;
 
 import app.*;
 import io.cucumber.java.en.*;
+import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class CreateActivitySteps {
-    private ProjectSystem projectSystem = AddEmployeeSteps.projectSystem;
+    private final ProjectSystem projectSystem = AddEmployeeSteps.projectSystem;
     private Project currentProject;
     private Activity currentActivity;
     private Employee currentEmployee;
@@ -15,21 +16,29 @@ public class CreateActivitySteps {
     public void aProjectWithTheNameIsAlreadyCreated(String projectName) {
         currentProject = projectSystem.getProjectByName(projectName);
         if (currentProject == null) {
-            currentProject = projectSystem.createProject(projectName, java.time.LocalDate.now(), java.time.LocalDate.now().plusDays(30));
+            currentProject = projectSystem.createProject(projectName, LocalDate.now(), LocalDate.now().plusDays(30));
         }
     }
 
     @And("employee {string} has logged in to manage activities")
     public void employeeHasLoggedInToManageActivities(String id) {
-        currentEmployee = new Employee(id);
-        currentEmployee.logIn();
-        projectSystem.registerEmployee(id);
+        currentEmployee = projectSystem.getEmployeeById(id);
+        if (currentEmployee == null) {
+            currentEmployee = new Employee(id);
+            currentEmployee.logIn();
+            projectSystem.registerEmployee(id);
+        } else {
+            currentEmployee.logIn();
+        }
     }
 
     @When("a new activity named {string} is added to the project {string}")
     public void aNewActivityNamedIsAddedToTheProject(String activityName, String projectName) {
-        currentActivity = new Activity(activityName);
-        currentProject.addActivity(currentActivity);
+        Project project = projectSystem.getProjectByName(projectName);
+        if (project.getActivityByName(activityName) == null) {
+            currentActivity = new Activity(activityName);
+            project.addActivity(currentActivity);
+        }
     }
 
     @Then("the activity {string} should now be part of the project {string}")
@@ -40,9 +49,10 @@ public class CreateActivitySteps {
 
     @And("the activity {string} is part of the project {string}")
     public void theActivityIsPartOfTheProject(String activityName, String projectName) {
-        Activity activity = new Activity(activityName);
-        currentProject = projectSystem.getProjectByName(projectName);
-        currentProject.addActivity(activity);
+        Project project = projectSystem.getProjectByName(projectName);
+        if (project.getActivityByName(activityName) == null) {
+            project.addActivity(new Activity(activityName));
+        }
     }
 
     @When("employee {string} is assigned to the activity {string}")
@@ -56,7 +66,9 @@ public class CreateActivitySteps {
         }
 
         try {
-            activity.assignEmployee(employee);
+            if (!activity.isEmployeeAssigned(employee)) {
+                activity.assignEmployee(employee);
+            }
         } catch (Exception e) {
             errorMessage = e.getMessage();
         }
@@ -71,11 +83,18 @@ public class CreateActivitySteps {
 
     @Given("employee {string} has already logged in and is assigned to 10 activities")
     public void employeeHasLoggedInAndIsAssignedTo10Activities(String id) {
-        currentEmployee = new Employee(id);
-        currentEmployee.logIn();
+        currentEmployee = projectSystem.getEmployeeById(id);
+        if (currentEmployee == null) {
+            currentEmployee = new Employee(id);
+            currentEmployee.logIn();
+            projectSystem.registerEmployee(id);
+        }
+
         for (int i = 0; i < 10; i++) {
             Activity a = new Activity("Activity" + i);
-            a.assignEmployee(currentEmployee);
+            if (!a.isEmployeeAssigned(currentEmployee)) {
+                a.assignEmployee(currentEmployee);
+            }
         }
     }
 
@@ -112,5 +131,43 @@ public class CreateActivitySteps {
         } catch (Exception e) {
             errorMessage = e.getMessage();
         }
+    }
+
+    @When("the project manager tries to add another activity named {string} to {string}")
+    public void theProjectManagerTriesToAddAnotherActivity(String activityName, String projectName) {
+        try {
+            Project project = projectSystem.getProjectByName(projectName);
+            if (project.getActivityByName(activityName) == null) {
+                project.addActivity(new Activity(activityName));
+            } else {
+                throw new IllegalArgumentException("Activity with name '" + activityName + "' already exists in project '" + projectName + "'");
+            }
+        } catch (Exception e) {
+            errorMessage = e.getMessage();
+        }
+    }
+
+    @Given("a second project with the name {string} is created")
+    public void aSecondProjectIsCreated(String projectName) {
+        if (projectSystem.getProjectByName(projectName) == null) {
+            projectSystem.createProject(projectName, LocalDate.now(), LocalDate.now().plusDays(30));
+        }
+    }
+
+    @When("another activity named {string} is added to the project {string}")
+    public void anotherActivityNamedIsAddedToTheProject(String activityName, String projectName) {
+        Project project = projectSystem.getProjectByName(projectName);
+        if (project.getActivityByName(activityName) == null) {
+            project.addActivity(new Activity(activityName));
+        }
+    }
+
+    @Then("both projects should contain an activity named {string}")
+    public void bothProjectsShouldContainAnActivityNamed(String activityName) {
+        Project projectA = projectSystem.getProjectByName("ProjectA");
+        Project projectB = projectSystem.getProjectByName("ProjectB");
+
+        assertNotNull(projectA.getActivityByName(activityName), "ProjectA does not contain the activity");
+        assertNotNull(projectB.getActivityByName(activityName), "ProjectB does not contain the activity");
     }
 }

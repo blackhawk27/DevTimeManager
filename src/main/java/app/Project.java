@@ -37,8 +37,12 @@ public class Project {
     }
 
     public void addActivity(Activity activity) {
+        if (getActivityByName(activity.getName()) != null) {
+            throw new IllegalArgumentException("Activity with name '" + activity.getName() + "' already exists in project '" + name + "'");
+        }
         activities.add(activity);
     }
+
 
     public List<Employee> getEmployees() {
         return new ArrayList<>(employees);

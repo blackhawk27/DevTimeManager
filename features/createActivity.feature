@@ -27,3 +27,18 @@ Feature: Create Activity
     And employee "E123" is already assigned to the activity "DesignPhase"
     When the project manager tries to assign employee "E123" to "DesignPhase" again
     Then the system should display the error "E123 is already assigned to DesignPhase"
+
+  Scenario: Prevent duplicate activity names in the same project
+    Given a project with the name "ProjectA" is already created
+    And employee "E111" has logged in to manage activities
+    When a new activity named "Development" is added to the project "ProjectA"
+    And the project manager tries to add another activity named "Development" to "ProjectA"
+    Then the system should display the error "Activity with name 'Development' already exists in project 'ProjectA'"
+
+  Scenario: Allow same activity name in different projects
+    Given a project with the name "ProjectA" is already created
+    And a second project with the name "ProjectB" is created
+    And employee "E222" has logged in to manage activities
+    When a new activity named "Testing" is added to the project "ProjectA"
+    And another activity named "Testing" is added to the project "ProjectB"
+    Then both projects should contain an activity named "Testing"
