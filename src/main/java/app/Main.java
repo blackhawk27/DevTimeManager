@@ -1,9 +1,5 @@
 package app;
 
-import app.Employee;
-import app.Project;
-import app.ProjectSystem;
-
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -13,13 +9,12 @@ public class Main {
     private static final Scanner scanner = new Scanner(System.in);
     private static final ProjectSystem projectSystem = new ProjectSystem();
     private static Employee currentEmployee = null;
-    private static final String firmName = "Softwarehuset A/S";
 
     public static void main(String[] args) {
         projectSystem.registerEmployee("teem");
         projectSystem.registerEmployee("huba");
         System.out.println("Welcome to the Project System Management for Softwarehuset A/S");
-        while(true) {
+        while (true) {
             if (currentEmployee == null || !currentEmployee.loggedIn) {
                 System.out.println("Type the number from the following options:");
                 System.out.println("1 - Log In");
@@ -36,202 +31,86 @@ public class Main {
             }
             String option = scanner.nextLine();
 
-            switch (option) {
-                case "1" -> logIn();
-                case "2" -> createProject();
-                case "3" -> assignEmployeeToProject();
-                case "4" -> createActivity();
-                case "5" -> assignEmployeeToActivity();
-                case "6" -> registerTime();
-                case "7" -> generateProjectReport();
-                case "8" -> assignProjectManager();
-                case "9" -> {
-                    System.out.println("Thank you for using Project System Mangement");
-                    return;}
-                default -> System.out.println("Invalid option");
+            try {
+                switch (option) {
+                    case "1" -> logIn();
+                    case "2" -> createProject();
+                    case "3" -> assignEmployeeToProject();
+                    case "4" -> createActivity();
+                    case "5" -> assignEmployeeToActivity();
+                    case "6" -> registerTime();
+                    case "7" -> generateProjectReport();
+                    case "8" -> assignProjectManager();
+                    case "9" -> {
+                        System.out.println("Thank you for using Project System Mangement");
+                        return;
+                    }
+                    default -> System.out.println("Invalid option");
+                }
+            } catch (RuntimeException e) {
+                System.out.println("Returning to main menu...");
             }
         }
     }
 
     private static void logIn() {
-        System.out.println("Please enter your four letter employee ID:");
-        String id = scanner.nextLine().toLowerCase();
+        String id = prompt("Please enter your four letter employee ID").toLowerCase();
         if (!projectSystem.isRegistered(id)) {
             System.out.println("Invalid employee ID");
             return;
-        } else {
-            currentEmployee = projectSystem.getEmployeeById(id);
-            currentEmployee.logIn();
-            System.out.println("You're now logged in as employee: teem");
         }
+        currentEmployee = projectSystem.getEmployeeById(id);
+        currentEmployee.logIn();
+        System.out.println("You're now logged in as employee: teem");
     }
+
     private static void createProject() {
         try {
-            System.out.println("Please enter your project name (ex. Greg's Website):");
-            String projectName = scanner.nextLine();
+            String projectName = prompt("Please enter your project name (ex. Greg's Website)");
             currentEmployee.inputProjectName(projectName);
-            System.out.println("Please enter start date (dd/MM/yyyy):");
-            LocalDate startDate = LocalDate.parse(scanner.nextLine(), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+            LocalDate startDate = LocalDate.parse(prompt("Please enter start date (dd/MM/yyyy)"), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
             currentEmployee.inputStartDate(startDate);
-            System.out.println("Please enter end date (dd/MM/yyyy):");
-            LocalDate endDate = LocalDate.parse(scanner.nextLine(), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+            LocalDate endDate = LocalDate.parse(prompt("Please enter end date (dd/MM/yyyy)"), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
             currentEmployee.inputEndDate(endDate);
-            Project project = currentEmployee.createProject(projectSystem);
+            var project = currentEmployee.createProject(projectSystem);
             System.out.println("Project " + project.getName() + " created successfully with id " + project.getId());
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
         }
     }
 
-    private static void createActivity() {
-        return;
-    }
-
     private static void assignEmployeeToProject() {
-        System.out.println("Enter project name:");
-        String projectId = scanner.nextLine();
-        System.out.println("Enter employee ID to add:");
-        String employeeId = scanner.nextLine();
-
+        String projectName = prompt("Enter project name");
+        String employeeId = prompt("Enter employee ID to add");
         try {
-            projectSystem.addEmployee(employeeId, projectId);
-            System.out.println("Employee " + employeeId + " added to project " + projectId);
+            projectSystem.addEmployee(employeeId, projectName);
+            System.out.println("Employee " + employeeId + " added to project " + projectName);
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
         }
     }
 
     private static void assignEmployeeToActivity() {
-        System.out.println("Enter project name:");
-        String projectId = scanner.nextLine();
-        System.out.println("Enter activity name:");
-        String activityName = scanner.nextLine();
-        System.out.println("Enter employee ID to assign:");
-        String employeeId = scanner.nextLine();
-
+        String projectName = prompt("Enter project name");
+        String activityName = prompt("Enter activity name");
+        String employeeId = prompt("Enter employee ID to assign");
         try {
-            projectSystem.addEmployee(employeeId, projectId, activityName);
-            System.out.println("Employee " + employeeId + " assigned to activity " + activityName + " in project " + projectId);
+            projectSystem.addEmployee(employeeId, projectName, activityName);
+            System.out.println("Employee " + employeeId + " assigned to activity " + activityName + " in project " + projectName);
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
         }
     }
 
-    private static void generateProjectReport() {
-        return;
-    }
-
-    private static void registerTime() {
-        System.out.println("Do you want to:");
-        System.out.println("1 - Register new time");
-        System.out.println("2 - Update existing time entry");
-        String choice = scanner.nextLine().trim();
-
-        switch (choice) {
-            case "1" -> registerNewTime();
-            case "2" -> updateTimeEntry();
-            default -> System.out.println("Invalid choice");
-        }
-    }
-
-    private static void registerNewTime() {
-        System.out.print("Type of entry (Work / SickDay / FreeTime / Course): ");
-        String type = scanner.nextLine().trim();
-
-        ArrayList<String> dateInputs = new ArrayList<>();
-
-        if (type.equalsIgnoreCase("Work")) {
-            System.out.print("Project name: ");
-            String projectName = scanner.nextLine().trim();
-
-            System.out.print("Activity name: ");
-            String activityName = scanner.nextLine().trim();
-
-            System.out.print("Start time (dd/MM/yyyy-HH:mm): ");
-            dateInputs.add(scanner.nextLine().trim());
-
-            System.out.print("End time (dd/MM/yyyy-HH:mm): ");
-            dateInputs.add(scanner.nextLine().trim());
-
-            try {
-                currentEmployee.registerTime("Work", dateInputs, projectName, activityName, projectSystem);
-                System.out.println("Work time registered.");
-            } catch (Exception e) {
-                System.out.println("Error: " + e.getMessage());
-            }
-
-        } else {
-            System.out.print("Start date (dd/MM/yyyy): ");
-            dateInputs.add(scanner.nextLine().trim());
-
-            System.out.print("End date (dd/MM/yyyy): ");
-            dateInputs.add(scanner.nextLine().trim());
-
-            try {
-                currentEmployee.registerTime(type, dateInputs, "", "", projectSystem);
-                System.out.println(type + " registered.");
-            } catch (Exception e) {
-                System.out.println("Error: " + e.getMessage());
-            }
-        }
-    }
-
-    private static void updateTimeEntry() {
-        System.out.println("Which type do you want to update?");
-        System.out.println("Options: Work / SickDay / FreeTime / Course");
-        String type = scanner.nextLine().trim();
-
-        ArrayList<String> dateInputs = new ArrayList<>();
-
-        if (type.equalsIgnoreCase("Work")) {
-            System.out.print("Project name: ");
-            String projectName = scanner.nextLine().trim();
-
-            System.out.print("Activity name: ");
-            String activityName = scanner.nextLine().trim();
-
-            System.out.print("New start time (dd/MM/yyyy-HH:mm): ");
-            dateInputs.add(scanner.nextLine().trim());
-
-            System.out.print("New end time (dd/MM/yyyy-HH:mm): ");
-            dateInputs.add(scanner.nextLine().trim());
-
-            try {
-                currentEmployee.registerTime("Work", dateInputs, projectName, activityName, projectSystem);
-                System.out.println("Work time card updated.");
-            } catch (Exception e) {
-                System.out.println("Error: " + e.getMessage());
-            }
-
-        } else {
-            System.out.print("New start date (dd/MM/yyyy): ");
-            dateInputs.add(scanner.nextLine().trim());
-
-            System.out.print("New end date (dd/MM/yyyy): ");
-            dateInputs.add(scanner.nextLine().trim());
-
-            try {
-                currentEmployee.registerTime(type, dateInputs, "", "", projectSystem);
-                System.out.println(type + " updated.");
-            } catch (Exception e) {
-                System.out.println("Error: " + e.getMessage());
-            }
-        }
-    }
-
     private static void assignProjectManager() {
-        System.out.println("Assign Project Manager");
-        System.out.print("Enter name");
-        String projectName = scanner.nextLine().trim();
+        String projectName = prompt("Enter name");
+        String managerId = prompt("Enter ID of the employee to assign as project manager");
 
         Project project = projectSystem.getProjectByName(projectName);
         if (project == null) {
             System.out.println("Project not found.");
             return;
         }
-
-        System.out.print("Enter ID of the employee to assign as project manager: ");
-        String managerId = scanner.nextLine().trim();
 
         if (!projectSystem.isRegistered(managerId)) {
             System.out.println("Error: " + managerId + " is not registered as an employee.");
@@ -246,5 +125,85 @@ public class Main {
         } catch (IllegalStateException e) {
             System.out.println("Error: " + e.getMessage());
         }
+    }
+
+    private static void registerTime() {
+        String choice = prompt("Do you want to:\n1 - Register new time\n2 - Update existing time entry");
+        switch (choice) {
+            case "1" -> registerNewTime();
+            case "2" -> updateTimeEntry();
+            default -> System.out.println("Invalid choice");
+        }
+    }
+
+    private static void registerNewTime() {
+        String type = prompt("Type of entry (Work / SickDay / FreeTime / Course)");
+        ArrayList<String> dateInputs = new ArrayList<>();
+
+        if (type.equalsIgnoreCase("Work")) {
+            String projectName = prompt("Project name");
+            String activityName = prompt("Activity name");
+            dateInputs.add(prompt("Start time (dd/MM/yyyy-HH:mm)"));
+            dateInputs.add(prompt("End time (dd/MM/yyyy-HH:mm)"));
+            try {
+                currentEmployee.registerTime("Work", dateInputs, projectName, activityName, projectSystem);
+                System.out.println("Work time registered.");
+            } catch (Exception e) {
+                System.out.println("Error: " + e.getMessage());
+            }
+        } else {
+            dateInputs.add(prompt("Start date (dd/MM/yyyy)"));
+            dateInputs.add(prompt("End date (dd/MM/yyyy)"));
+            try {
+                currentEmployee.registerTime(type, dateInputs, "", "", projectSystem);
+                System.out.println(type + " registered.");
+            } catch (Exception e) {
+                System.out.println("Error: " + e.getMessage());
+            }
+        }
+    }
+
+    private static void updateTimeEntry() {
+        String type = prompt("Which type do you want to update?\nOptions: Work / SickDay / FreeTime / Course");
+        ArrayList<String> dateInputs = new ArrayList<>();
+
+        if (type.equalsIgnoreCase("Work")) {
+            String projectName = prompt("Project name");
+            String activityName = prompt("Activity name");
+            dateInputs.add(prompt("New start time (dd/MM/yyyy-HH:mm)"));
+            dateInputs.add(prompt("New end time (dd/MM/yyyy-HH:mm)"));
+            try {
+                currentEmployee.registerTime("Work", dateInputs, projectName, activityName, projectSystem);
+                System.out.println("Work time card updated.");
+            } catch (Exception e) {
+                System.out.println("Error: " + e.getMessage());
+            }
+        } else {
+            dateInputs.add(prompt("New start date (dd/MM/yyyy)"));
+            dateInputs.add(prompt("New end date (dd/MM/yyyy)"));
+            try {
+                currentEmployee.registerTime(type, dateInputs, "", "", projectSystem);
+                System.out.println(type + " updated.");
+            } catch (Exception e) {
+                System.out.println("Error: " + e.getMessage());
+            }
+        }
+    }
+
+    private static void createActivity() {
+        // Not implemented yet
+    }
+
+    private static void generateProjectReport() {
+        // Not implemented yet
+    }
+
+    private static String prompt(String message) {
+        System.out.print(message + ": ");
+        String input = scanner.nextLine().trim();
+        if (input.equalsIgnoreCase("q")) {
+            throw new RuntimeException("Cancelled");
+        }
+        return input;
     }
 }
