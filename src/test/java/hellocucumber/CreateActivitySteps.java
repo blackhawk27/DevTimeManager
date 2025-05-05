@@ -40,8 +40,8 @@ public class CreateActivitySteps {
         currentEmployee.logIn();
     }
 
-    @When("a new activity with ID {string}, name {string}, start date {string} and end date {string} is added to the project {string}")
-    public void addActivityWithAllDetails(String id, String name, String start, String end, String projectName) {
+    @When("a new activity with name {string}, start date {string} and end date {string} is added to the project {string}")
+    public void addActivityWithoutId(String name, String start, String end, String projectName) {
         try {
             LocalDate startDate = parse(start);
             LocalDate endDate = parse(end);
@@ -54,6 +54,7 @@ public class CreateActivitySteps {
                 errorMessage = "Activity with name '" + name + "' already exists in project '" + projectName + "'";
                 return;
             }
+            String id = projectSystem.generateActivityID(); // automatisk ID
             Activity activity = new Activity(id, name, startDate, endDate);
             project.addActivity(activity);
         } catch (Exception e) {
@@ -61,13 +62,14 @@ public class CreateActivitySteps {
         }
     }
 
-    @Then("the activity {string} with ID {string} should now be part of the project {string}")
-    public void verifyActivityInProject(String name, String id, String projectName) {
+
+    @Then("the activity {string} should now be part of the project {string}")
+    public void verifyActivityExists(String name, String projectName) {
         Project project = projectSystem.getProjectByName(projectName);
         Activity activity = project.getActivityByName(name);
-        assertNotNull(activity);
-        assertEquals(id, activity.getId());
+        assertNotNull(activity, "Activity should exist in project");
     }
+
 
     @Then("the system should display the error {string}")
     public void systemDisplaysError(String expected) {
@@ -81,10 +83,11 @@ public class CreateActivitySteps {
         }
     }
 
-    @When("another activity with ID {string}, name {string}, start date {string} and end date {string} is added to the project {string}")
-    public void addActivityToAnotherProject(String id, String name, String start, String end, String projectName) {
-        addActivityWithAllDetails(id, name, start, end, projectName);
+    @When("the project manager tries to add another activity with name {string}, start date {string} and end date {string} to project {string}")
+    public void tryAddingDuplicateActivityWithoutId(String name, String start, String end, String projectName) {
+        addActivityWithoutId(name, start, end, projectName);
     }
+
 
     @Then("both projects should contain an activity named {string}")
     public void verifyActivityInBothProjects(String activityName) {
@@ -105,6 +108,7 @@ public class CreateActivitySteps {
             }
         } catch (Exception e) {
             errorMessage = e.getMessage();
+
         }
     }
 
@@ -117,18 +121,21 @@ public class CreateActivitySteps {
 
     @Given("employee {string} is logged in and already assigned to 10 activities")
     public void assign10Activities(String id) {
-        currentEmployee = projectSystem.getEmployeeById(id);
-        if (currentEmployee == null) {
-            currentEmployee = new Employee(id);
+        if (!projectSystem.isRegistered(id)) {
             projectSystem.registerEmployee(id);
         }
+
+        currentEmployee = projectSystem.getEmployeeById(id);  // <-- kritisk linje!
         currentEmployee.logIn();
 
         for (int i = 0; i < 10; i++) {
             Activity dummy = new Activity("A" + i, "Dummy" + i, LocalDate.now(), LocalDate.now().plusDays(5));
             dummy.assignEmployee(currentEmployee);
         }
+
+        projectSystem.addEmployee(id, currentProject.getName());
     }
+
 
     @When("the project manager attempts to assign employee {string} to a new activity with ID {string}, name {string}, start date {string} and end date {string}")
     public void failAssignmentDueToLimit(String id, String aid, String name, String start, String end) {
@@ -154,8 +161,33 @@ public class CreateActivitySteps {
         assignEmployeeToActivity(id, name);
     }
 
-    @When("the project manager tries to add another activity with ID {string}, name {string}, start date {string} and end date {string} to project {string}")
-    public void tryAddingDuplicateActivity(String id, String name, String start, String end, String projectName) {
-        addActivityWithAllDetails(id, name, start, end, projectName);
+    @And("another activity with name {string}, start date {string} and end date {string} is added to the project {string}")
+    public void addSecondActivityWithoutId(String name, String start, String end, String projectName) {
+        addActivityWithoutId(name, start, end, projectName);
     }
+
+    @When("the project manager attempts to assign employee {string} to a new activity with name {string}, start date {string} and end date {string}")
+    public void failAssignmentDueToLimitNoId(String empId, String name, String start, String end) {
+        try {
+            Employee emp = projectSystem.getEmployeeById(empId);
+            if (emp == null) {
+                emp = new Employee(empId);
+                emp.logIn();
+                projectSystem.registerEmployee(empId);
+            }
+
+            LocalDate startDate = parse(start);
+            LocalDate endDate = parse(end);
+            String generatedId = projectSystem.generateActivityID();
+
+            Activity newActivity = new Activity(generatedId, name, startDate, endDate);
+            currentProject.addActivity(newActivity);
+            newActivity.assignEmployee(emp);
+        } catch (Exception e) {
+            errorMessage = e.getMessage();
+        }
+    }
+
+
+
 }

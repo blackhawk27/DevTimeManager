@@ -5,7 +5,7 @@ Feature: Generate project report
   Scenario: Successfully generating a report
     Given a project with the title "ProjectX" exists
     And employee "E123" has logged in to manage activities
-    And a new activity with ID "BUDX" name "BudgetActivity" start date "01/05/2025" and end date "31/05/2025" is added to the project "ProjectX"
+    And a new activity named "BudgetActivity" with start date "01/05/2025" and end date "31/05/2025" is added to the project "ProjectX"
     And "BudgetActivity" in "ProjectX" has a budgeted time of 100 hours
     And 75 hours of work are registered on activity "BudgetActivity" in "ProjectX"
     When the project manager generates a report for "ProjectX"
@@ -16,9 +16,9 @@ Feature: Generate project report
     And the system displays the estimated remaining work time
 
   Scenario: Generating a report for a project with no registered work time
-    Given a project with the title "ProjectX" exists
+    Given a project with the title "ProjectY" exists
     And employee "E123" has logged in to manage activities
-    And a new activity with ID "BUDY" name "BudgetActivity" start date "01/05/2025" and end date "31/05/2025" is added to the project "ProjectY"
+    And a new activity named "BudgetActivity" with start date "01/05/2025" and end date "31/05/2025" is added to the project "ProjectY"
     And "BudgetActivity" in "ProjectY" has a budgeted time of 50 hours
     And no hours have been registered on "ProjectY"
     When the project manager generates a report for "ProjectY"
@@ -35,7 +35,7 @@ Feature: Generate project report
   Scenario: Generating a report when budgeted time is not set
     Given a project with the title "ProjectZ" exists
     And employee "E123" has logged in to manage activities
-    And a new activity with ID "BUDZ" name "BudgetActivity" start date "01/05/2025" and end date "31/05/2025" is added to the project "ProjectZ"
+    And a new activity named "BudgetActivity" with start date "01/05/2025" and end date "31/05/2025" is added to the project "ProjectZ"
     And 10 hours of work are registered on activity "BudgetActivity" in "ProjectZ"
     When the project manager generates a report for "ProjectZ"
     Then the system displays an error message "Budgeted time is missing for this project"

@@ -37,11 +37,12 @@ public class GenerateProjectReportSteps {
         emp.logIn();
     }
 
-    @And("a new activity with ID {string} name {string} start date {string} and end date {string} is added to the project {string}")
-    public void newActivityWithDatesAdded(String id, String name, String start, String end, String projectName) {
+    @And("a new activity named {string} with start date {string} and end date {string} is added to the project {string}")
+    public void newActivityWithNameDatesAdded(String name, String start, String end, String projectName) {
         LocalDate startDate = parseDate(start);
         LocalDate endDate = parseDate(end);
         Project project = projectSystem.getProjectByName(projectName);
+
         if (startDate.isAfter(endDate)) {
             errorMessage = "End date cannot be before start date";
             return;
@@ -50,9 +51,13 @@ public class GenerateProjectReportSteps {
             errorMessage = "Activity with name '" + name + "' already exists in project '" + projectName + "'";
             return;
         }
-        Activity activity = new Activity(id, name, startDate, endDate);
+
+        // Generér ID via systemet
+        String generatedId = projectSystem.generateActivityID();
+        Activity activity = new Activity(generatedId, name, startDate, endDate);
         project.addActivity(activity);
     }
+
 
     @And("{string} in {string} has a budgeted time of {int} hours")
     public void activityHasBudgetedTime(String activityName, String projectName, int hours) {
@@ -65,13 +70,17 @@ public class GenerateProjectReportSteps {
     public void registerHoursOfWork(int hours, String activityName, String projectName) {
         Project project = projectSystem.getProjectByName(projectName);
         Activity activity = project.getActivityByName(activityName);
+        LocalDate baseDate = LocalDate.of(2025, 5, 1);  // Start fra 1. maj 2025
+
         IntStream.range(0, hours).forEach(i -> {
-            LocalDateTime start = LocalDateTime.of(2025, 5, 1 + i, 9, 0);
+            LocalDate day = baseDate.plusDays(i);  // Sikrer gyldig dato
+            LocalDateTime start = day.atTime(9, 0);
             LocalDateTime end = start.plusHours(1);
             TimeEntry entry = new TimeEntry(TimeEntry.EntryType.Work, start, end, projectName, activityName);
             activity.addWorkEntry(entry);
         });
     }
+
 
     @And("no hours have been registered on {string}")
     public void noHoursHaveBeenRegistered(String projectName) {
@@ -85,8 +94,18 @@ public class GenerateProjectReportSteps {
         currentReport = projectSystem.getProjectByName(projectName);
         if (currentReport == null) {
             errorMessage = "Project not found";
+            return;
+        }
+
+        boolean allZero = currentReport.getActivities().stream()
+                .mapToInt(Activity::getBudgetedTime)
+                .sum() == 0;
+
+        if (allZero) {
+            errorMessage = "Budgeted time is missing for this project";
         }
     }
+
 
     @Then("the system displays the total registered hours as {int}")
     public void systemDisplaysTotalRegisteredHours(int expected) {

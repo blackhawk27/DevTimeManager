@@ -8,8 +8,11 @@ import java.util.Map;
 
 public class ProjectSystem {
     private int projectCounter = 1;
+    private int activityCounter = 1;  // fx i ProjectSystem
+
     private List<Project> projects = new ArrayList<>();
     private Map<String, Employee> employees = new HashMap<>();
+
 
 
     public ProjectSystem() {
@@ -33,6 +36,13 @@ public class ProjectSystem {
         String id = year + String.format("%03d", projectCounter++);
         return id;
     }
+
+
+
+    public String generateActivityID() {
+        return "A" + String.format("%03d", activityCounter++);
+    }
+
 
     public Project getProjectByName(String name) {
         for (Project project : projects) {
