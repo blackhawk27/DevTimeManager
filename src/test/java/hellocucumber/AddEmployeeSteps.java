@@ -28,11 +28,13 @@ public class AddEmployeeSteps {
 
     @Given("a project {string} exists")
     public void aProjectExists(String projectName) {
-        projectSystem.createProject(
-                projectName,
-                LocalDate.now(),
-                LocalDate.now().plusMonths(6)
-        );
+        if (projectSystem.getProjectByName(projectName) == null) {
+            projectSystem.createProject(
+                    projectName,
+                    LocalDate.now(),
+                    LocalDate.now().plusMonths(6)
+            );
+        }
     }
 
 
