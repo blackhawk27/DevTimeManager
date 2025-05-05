@@ -46,14 +46,14 @@ public class ProjectSystem {
     /**
      * Adds an employee to a project only.
      */
-    public void addEmployee(String employeeId, String projectId) {
+    public void addEmployee(String employeeId, String projectName) {
         if (!isRegistered(employeeId)) {
             throw new IllegalArgumentException("Employee with ID " + employeeId + " does not exist");
         }
 
-        Project project = getProjectById(projectId);
+        Project project = getProjectByName(projectName);
         if (project == null) {
-            throw new IllegalArgumentException("Project with ID " + projectId + " does not exist");
+            throw new IllegalArgumentException("Project with ID " + projectName + " does not exist");
         }
 
         Employee employee = getEmployeeById(employeeId);
@@ -67,14 +67,14 @@ public class ProjectSystem {
     /**
      * Adds an employee to a project and an activity.
      */
-    public void addEmployee(String employeeId, String projectId, String activityName) {
+    public void addEmployee(String employeeId, String projectName, String activityName) {
         // Først sikre at medarbejderen er på projektet – uden duplikat
-        addEmployee(employeeId, projectId);
+        addEmployee(employeeId, projectName);
 
-        Project project = getProjectById(projectId);
+        Project project = getProjectByName(projectName);
         Activity activity = project.getActivityByName(activityName);
         if (activity == null) {
-            throw new IllegalArgumentException("Activity " + activityName + " not found in project " + projectId);
+            throw new IllegalArgumentException("Activity " + activityName + " not found in project " + projectName);
         }
 
         Employee employee = getEmployeeById(employeeId);

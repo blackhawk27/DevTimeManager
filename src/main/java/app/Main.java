@@ -17,7 +17,7 @@ public class Main {
 
     public static void main(String[] args) {
         projectSystem.registerEmployee("teem");
-        projectSystem.registerEmployee("paby");
+        projectSystem.registerEmployee("huba");
         System.out.println("Welcome to the Project System Management for Softwarehuset A/S");
         while(true) {
             if (currentEmployee == null || !currentEmployee.loggedIn) {
@@ -55,7 +55,7 @@ public class Main {
 
     private static void logIn() {
         System.out.println("Please enter your four letter employee ID:");
-        String id = scanner.nextLine();
+        String id = scanner.nextLine().toLowerCase();
         if (!projectSystem.isRegistered(id)) {
             System.out.println("Invalid employee ID");
             return;
@@ -93,7 +93,7 @@ public class Main {
     }
 
     private static void assignEmployeeToProject() {
-        System.out.println("Enter project ID:");
+        System.out.println("Enter project name:");
         String projectId = scanner.nextLine();
         System.out.println("Enter employee ID to add:");
         String employeeId = scanner.nextLine();
@@ -227,9 +227,9 @@ public class Main {
     private static void assignProjectManager() {
         System.out.println("Assign Project Manager");
         System.out.print("Enter project ID (ex. 25001): ");
-        String projectId = scanner.nextLine().trim();
+        String projectName = scanner.nextLine().trim();
 
-        Project project = projectSystem.getProjectById(projectId);
+        Project project = projectSystem.getProjectByName(projectName);
         if (project == null) {
             System.out.println("Project not found.");
             return;
