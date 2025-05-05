@@ -195,10 +195,10 @@ public class Main {
             System.out.print("Activity name: ");
             String activityName = scanner.nextLine().trim();
 
-            System.out.print("New start time (yyyy-MM-dd-HH:mm): ");
+            System.out.print("New start time (dd/MM/yyyy-HH:mm): ");
             dateInputs.add(scanner.nextLine().trim());
 
-            System.out.print("New end time (yyyy-MM-dd-HH:mm): ");
+            System.out.print("New end time (dd/MM/yyyy-HH:mm): ");
             dateInputs.add(scanner.nextLine().trim());
 
             try {
@@ -209,10 +209,10 @@ public class Main {
             }
 
         } else {
-            System.out.print("New start date (yyyy-MM-dd): ");
+            System.out.print("New start date (dd/MM/yyyy): ");
             dateInputs.add(scanner.nextLine().trim());
 
-            System.out.print("New end date (yyyy-MM-dd): ");
+            System.out.print("New end date (dd/MM/yyyy): ");
             dateInputs.add(scanner.nextLine().trim());
 
             try {
