@@ -51,3 +51,16 @@ Feature: Create Project
     And the employee creates the project
     Then the system outputs the error message "Employee must be logged in to create a project."
     And the project is not created
+
+  Scenario: Unsuccessful creation of a project with the same name as an already existing project
+    Given an employee with id "E123" logs in to create project
+    And the employee inputs name "New Website"
+    And the employee inputs start date "01/06/2025"
+    And the employee inputs end date "30/06/2025"
+    And the employee creates the project
+    And the employee inputs name "New Website"
+    And the employee inputs start date "01/07/2025"
+    And the employee inputs end date "31/07/2025"
+    And the employee creates the project
+    Then the system outputs the error message "Project already exists. New project has not been created."
+    And the project is not created

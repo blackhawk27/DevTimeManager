@@ -18,6 +18,10 @@ public class ProjectSystem {
 
 
     public Project createProject(String name, LocalDate start, LocalDate end) {
+        if(getProjectByName(name) != null){
+            throw new IllegalArgumentException("Project already exists. New project has not been created.");
+        }
+
         String id = generateProjectID();
         Project project = new Project(name, id, start, end);
         projects.add(project);
