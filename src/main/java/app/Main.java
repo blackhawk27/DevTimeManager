@@ -83,11 +83,6 @@ public class Main {
         }
     }
 
-    private static void addEmployeeToProject() {
-        System.out.println("Please enter project ID");
-        return;
-    }
-
     private static void createActivity() {
         return;
     }
@@ -107,7 +102,7 @@ public class Main {
     }
 
     private static void assignEmployeeToActivity() {
-        System.out.println("Enter project ID:");
+        System.out.println("Enter project name:");
         String projectId = scanner.nextLine();
         System.out.println("Enter activity name:");
         String activityName = scanner.nextLine();
@@ -226,7 +221,7 @@ public class Main {
 
     private static void assignProjectManager() {
         System.out.println("Assign Project Manager");
-        System.out.print("Enter project ID (ex. 25001): ");
+        System.out.print("Enter name");
         String projectName = scanner.nextLine().trim();
 
         Project project = projectSystem.getProjectByName(projectName);
