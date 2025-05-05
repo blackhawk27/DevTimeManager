@@ -70,10 +70,10 @@ public class Main {
             System.out.println("Please enter your project name (ex. Greg's Website):");
             String projectName = scanner.nextLine();
             currentEmployee.inputProjectName(projectName);
-            System.out.println("Please enter start date (dd/mm/yyyy):");
+            System.out.println("Please enter start date (dd/MM/yyyy):");
             LocalDate startDate = LocalDate.parse(scanner.nextLine(), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
             currentEmployee.inputStartDate(startDate);
-            System.out.println("Please enter end date (dd/mm/yyyy):");
+            System.out.println("Please enter end date (dd/MM/yyyy):");
             LocalDate endDate = LocalDate.parse(scanner.nextLine(), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
             currentEmployee.inputEndDate(endDate);
             Project project = currentEmployee.createProject(projectSystem);
@@ -152,10 +152,10 @@ public class Main {
             System.out.print("Activity name: ");
             String activityName = scanner.nextLine().trim();
 
-            System.out.print("Start time (yyyy-MM-dd-HH:mm): ");
+            System.out.print("Start time (dd/MM/yyyy-HH:mm): ");
             dateInputs.add(scanner.nextLine().trim());
 
-            System.out.print("End time (yyyy-MM-dd-HH:mm): ");
+            System.out.print("End time (dd/MM/yyyy-HH:mm): ");
             dateInputs.add(scanner.nextLine().trim());
 
             try {
@@ -166,10 +166,10 @@ public class Main {
             }
 
         } else {
-            System.out.print("Start date (yyyy-MM-dd): ");
+            System.out.print("Start date (dd/MM/yyyy): ");
             dateInputs.add(scanner.nextLine().trim());
 
-            System.out.print("End date (yyyy-MM-dd): ");
+            System.out.print("End date (dd/MM/yyyy): ");
             dateInputs.add(scanner.nextLine().trim());
 
             try {
