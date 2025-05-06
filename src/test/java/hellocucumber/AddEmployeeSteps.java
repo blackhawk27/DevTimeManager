@@ -14,7 +14,6 @@ public class AddEmployeeSteps {
     private Activity activity;
     private Employee employee;
     private String errorMessage;
-
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     @Given("a project {string} exists")
@@ -25,18 +24,20 @@ public class AddEmployeeSteps {
         }
     }
 
-    @And("an activity with ID {string}, name {string}, start date {string} and end date {string} exists in {string}")
-    public void anActivityExists(String id, String name, String startDate, String endDate, String projectName) {
+    @And("an activity with name {string}, start date {string} and end date {string} exists in {string}")
+    public void anActivityExists(String name, String startDate, String endDate, String projectName) {
         LocalDate start = LocalDate.parse(startDate, DATE_FORMAT);
         LocalDate end = LocalDate.parse(endDate, DATE_FORMAT);
         Project targetProject = projectSystem.getProjectByName(projectName);
-        activity = new Activity(id, name, start, end);
+        String generatedId = projectSystem.generateActivityID();
+        activity = new Activity(generatedId, name, start, end);
         try {
             targetProject.addActivity(activity);
         } catch (Exception e) {
             errorMessage = e.getMessage();
         }
     }
+
 
     @And("an employee with id {string} exists")
     public void anEmployeeExists(String id) {
@@ -103,4 +104,6 @@ public class AddEmployeeSteps {
     public void shouldReturnError(String expectedMessage) {
         assertEquals(expectedMessage, errorMessage);
     }
+
 }
+

@@ -32,16 +32,18 @@ public class RegisterTimeSteps {
     }
 
 
-    @And("an activity with ID {string}, name {string}, start date {string} and end date {string} is prepared for time registration in project {string}")
-    public void prepareActivityForTimeRegistration(String id, String name, String startDate, String endDate, String projectName) {
+    @And("an activity with name {string}, start date {string} and end date {string} is prepared for time registration in project {string}")
+    public void prepareActivityForTimeRegistration(String name, String startDate, String endDate, String projectName) {
         LocalDate start = LocalDate.parse(startDate, DATE_FORMAT);
         LocalDate end = LocalDate.parse(endDate, DATE_FORMAT);
-        activity = new Activity(id, name, start, end);
+        String generatedId = projectSystem.generateActivityID();
+        activity = new Activity(generatedId, name, start, end);
         project = projectSystem.getProjectByName(projectName);
         if (project.getActivityByName(name) == null) {
             project.addActivity(activity);
         }
     }
+
 
 
     @Given("an employee with id {string} is logged in")
