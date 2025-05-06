@@ -103,4 +103,19 @@ public class AddEmployeeSteps {
     public void shouldReturnError(String expectedMessage) {
         assertEquals(expectedMessage, errorMessage);
     }
+
+    @And("an activity named {string}, start date {string} and end date {string} exists in {string}")
+    public void anActivityNamedStartDateAndEndDateExistsIn(String name, String startDate, String endDate, String projectName) {
+        LocalDate start = LocalDate.parse(startDate, DATE_FORMAT);
+        LocalDate end = LocalDate.parse(endDate, DATE_FORMAT);
+        Project targetProject = projectSystem.getProjectByName(projectName);
+        String generatedId = projectSystem.generateActivityID();
+        activity = new Activity(generatedId, name, start, end);
+        try {
+            targetProject.addActivity(activity);
+        }
+        catch (Exception e) {
+            errorMessage = e.getMessage();
+        }
+    }
 }

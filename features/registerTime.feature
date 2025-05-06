@@ -4,7 +4,7 @@ Feature: Register time
 
   Scenario: Successfully register time on activity
     Given a project named "ProjectY" is prepared for time registration
-    And an activity with ID "A1", name "Coding", start date "01/06/2025" and end date "15/06/2025" is prepared for time registration in project "ProjectY"
+    And an activity named "Coding", start date "01/06/2025" and end date "15/06/2025" is prepared for time registration in project "ProjectY"
     And an employee with id "E123" is logged in
     And employee "E123" is assigned to the activity "ActivityX" for time registration
     When the employee registers in the system that he started to work on "ActivityX" under "ProjectY" at "09:00" and stopped at "17:00"
@@ -12,7 +12,7 @@ Feature: Register time
 
   Scenario: Updating wrongly registered time on activity
     Given a project named "ProjectY" is prepared for time registration
-    And an activity with ID "A1", name "Coding", start date "01/06/2025" and end date "15/06/2025" is prepared for time registration in project "ProjectY"
+    And an activity named "Coding", start date "01/06/2025" and end date "15/06/2025" is prepared for time registration in project "ProjectY"
     And an employee with id "E123" is logged in
     And employee "E123" is assigned to the activity "ActivityX" for time registration
     And the employee registers in the system that he started to work on "ActivityX" under "ProjectY" at "09:00" and stopped at "15:00"
@@ -26,7 +26,7 @@ Feature: Register time
 
   Scenario: Register sick leave despite have registered work time
     Given a project named "ProjectY" is prepared for time registration
-    And an activity with ID "A1", name "Coding", start date "01/06/2025" and end date "15/06/2025" is prepared for time registration in project "ProjectY"
+    And an activity named "Coding", start date "01/06/2025" and end date "15/06/2025" is prepared for time registration in project "ProjectY"
     And an employee with id "E123" is logged in
     And employee "E123" is assigned to the activity "ActivityX" for time registration
     And the employee has registered work time on "ActivityX" under "ProjectY" on "31/03/2025"

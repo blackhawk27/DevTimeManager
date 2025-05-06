@@ -191,4 +191,19 @@ public class RegisterTimeSteps {
             assertTrue(found, "Expected sick leave on " + d);
         }
     }
+
+    @And("an activity named {string}, start date {string} and end date {string} is prepared for time registration in project {string}")
+    public void anActivityNamedStartDateAndEndDateIsPreparedForTimeRegistrationInProject(String name, String startDate, String endDate, String projectName) {
+        LocalDate start = LocalDate.parse(startDate, DATE_FORMAT);
+        LocalDate end = LocalDate.parse(endDate, DATE_FORMAT);
+        project = projectSystem.getProjectByName(projectName);
+        if (project == null) {
+            throw new IllegalArgumentException("Project " + projectName + " does not exist");
+        }
+        String generatedId = projectSystem.generateActivityID();
+        activity = new Activity(generatedId, name, start, end);
+        if (project.getActivityByName(projectName) == null) {
+            project.addActivity(activity);
+        }
+    }
 }
