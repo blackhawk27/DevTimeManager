@@ -98,7 +98,7 @@ public class AddProjectManagerToProjectSteps {
         try {
             // Try assigning project manager
             project.assignProjectManager(assigningEmployee, newManager);
-        } catch (IllegalStateException e) { 
+        } catch (IllegalStateException e) {
             errorMessage = e.getMessage();  // Catch the error message
         }
     }
@@ -143,3 +143,4 @@ public class AddProjectManagerToProjectSteps {
     }
 
 }
+
