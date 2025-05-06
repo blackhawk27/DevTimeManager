@@ -89,5 +89,4 @@ public class Project {
         newManager.addProject(this);
     }
 
-
 }
