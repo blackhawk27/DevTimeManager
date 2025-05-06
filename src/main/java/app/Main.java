@@ -191,8 +191,37 @@ public class Main {
     }
 
     private static void createActivity() {
-        // Not implemented yet
+        try {
+            String projectName = prompt("Enter the name of the project");
+            Project project = projectSystem.getProjectByName(projectName);
+            if (project == null) {
+                System.out.println("Project not found.");
+                return;
+            }
+
+            String name = prompt("Enter activity name");
+            LocalDate start = LocalDate.parse(prompt("Enter start date (dd/MM/yyyy)"), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+            LocalDate end = LocalDate.parse(prompt("Enter end date (dd/MM/yyyy)"), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+
+            if (start.isAfter(end)) {
+                System.out.println("Error: End date cannot be before start date");
+                return;
+            }
+
+            if (project.getActivityByName(name) != null) {
+                System.out.println("Error: Activity with name '" + name + "' already exists in project '" + projectName + "'");
+                return;
+            }
+
+            String generatedId = projectSystem.generateActivityID();
+            Activity activity = new Activity(generatedId, name, start, end);
+            project.addActivity(activity);
+            System.out.println("Activity '" + name + "' created with ID: " + generatedId + " in project '" + projectName + "'");
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+        }
     }
+
 
     private static void generateProjectReport() {
         // Not implemented yet
