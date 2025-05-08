@@ -5,9 +5,11 @@ Feature: Create Project
     When the employee inputs name "New Website"
     And the employee inputs start date "01/01/2025"
     And the employee inputs end date "01/02/2025"
+    And the employee inputs budgeted time 120.0
     And the employee creates the project
     Then the system creates the project "New Website"
     And the system returns a project ID "25001"
+
 
   Scenario: Unsuccessful creation of a project with empty name
     Given an employee with id "E123" logs in to create project

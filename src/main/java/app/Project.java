@@ -1,6 +1,7 @@
 package app;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,15 +10,18 @@ public class Project {
     private String id;
     private LocalDate startDate;
     private LocalDate endDate;
+    private double budgetedTime;
     private List<Employee> employees = new ArrayList<>();
     private final List<Activity> activities = new ArrayList<>();
     private ProjectManager projectManager;
+    private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-    public Project(String name, String id, LocalDate start, LocalDate end) {
+    public Project(String name, String id, LocalDate start, LocalDate end, double budgetedTime) {
         this.name = name;
         this.id = id;
         this.startDate = start;
         this.endDate = end;
+        this.budgetedTime = budgetedTime;
     }
 
     public String getName() {
@@ -44,6 +48,35 @@ public class Project {
     }
 
 
+    public double getBudgetedTime() {
+        return budgetedTime;
+    }
+
+    public void setBudgetedTime(double budgetedTime) {
+        this.budgetedTime = budgetedTime;
+    }
+
+    public double getTotalBudgetedTime() {
+        return activities.stream()
+                .mapToDouble(Activity::getBudgetedTime)
+                .sum();
+    }
+//
+//    public double calculateActualTimeUsed() {
+//        double totalTime = 0;
+//
+//        // Iterate over each employee and their time entries
+//        for (Employee employee : employees) {
+//            for (TimeEntry timeEntry : employee.getTimeRegistry()) {
+//                // Only calculate work time entries
+//                if (timeEntry.getType() == TimeEntry.EntryType.Work) {
+//                    totalTime += timeEntry.getWorkDurationInHours();
+//                }
+//            }
+//        }
+//        return totalTime;
+//    }
+
     public List<Employee> getEmployees() {
         return new ArrayList<>(employees);
     }
@@ -62,7 +95,7 @@ public class Project {
     }
 
     public List<Activity> getActivities() {
-        return new ArrayList<>(activities); // Return a copy to protect internal list
+        return activities;
     }
 
     public void setProjectManager(ProjectManager manager) {

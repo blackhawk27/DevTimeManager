@@ -12,6 +12,7 @@ public class Employee {
     private String tempProjectName;
     private LocalDate tempStartDate;
     private LocalDate tempEndDate;
+    private double budgetedTime;
     private int assignedActivitiesCount = 0;
     private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy-HH:mm");
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -58,6 +59,10 @@ public class Employee {
         tempEndDate = date;
     }
 
+    public void inputBudgetedTime(double time) {
+        this.budgetedTime = time;
+    }
+
     public Project createProject(ProjectSystem system) {
         if (!loggedIn) {
             throw new IllegalArgumentException("Employee must be logged in to create a project.");
@@ -79,7 +84,7 @@ public class Employee {
             throw new IllegalArgumentException("Start date must be before or equal to end date. Project has not been created.");
         }
 
-        return system.createProject(tempProjectName, tempStartDate, tempEndDate);
+        return system.createProject(tempProjectName, tempStartDate, tempEndDate, budgetedTime);
     }
 
     public boolean canTakeMoreActivities() {

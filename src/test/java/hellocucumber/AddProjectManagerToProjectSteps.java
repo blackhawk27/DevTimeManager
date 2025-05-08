@@ -28,7 +28,7 @@ public class AddProjectManagerToProjectSteps {
         LocalDate startDate = LocalDate.now();
         LocalDate endDate = LocalDate.now().plusMonths(6);
         String projectId = "250001";  // Example project ID (you can generate this dynamically)
-        project = new Project(projectName, projectId, startDate, endDate);
+        project = new Project(projectName, projectId, startDate, endDate, 0.0);
     }
 
     @And("an employee with id {string} is assigned to {string}")
@@ -81,7 +81,7 @@ public class AddProjectManagerToProjectSteps {
         LocalDate startDate = LocalDate.now();
         LocalDate endDate = LocalDate.now().plusMonths(6);
         String projectId = "0001";  // Example project ID
-        project = new Project(projectName, projectId, startDate, endDate);
+        project = new Project(projectName, projectId, startDate, endDate, 0.0);
 
         // Assign the project manager
         ProjectManager manager = new ProjectManager(managerId);

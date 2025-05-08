@@ -27,7 +27,7 @@ public class RegisterTimeSteps {
         projectSystem = new ProjectSystem();
         project = projectSystem.getProjectByName(projectName);
         if (project == null) {
-            project = projectSystem.createProject(projectName, LocalDate.now(), LocalDate.now().plusDays(30));
+            project = projectSystem.createProject(projectName, LocalDate.now(), LocalDate.now().plusDays(30), 100);
         }
     }
 

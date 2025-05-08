@@ -20,13 +20,13 @@ public class ProjectSystem {
     }
 
 
-    public Project createProject(String name, LocalDate start, LocalDate end) {
+    public Project createProject(String name, LocalDate start, LocalDate end, double budgetedTime) {
         if(getProjectByName(name) != null){
             throw new IllegalArgumentException("Project already exists. New project has not been created.");
         }
 
         String id = generateProjectID();
-        Project project = new Project(name, id, start, end);
+        Project project = new Project(name, id, start, end, budgetedTime);
         projects.add(project);
         return project;
     }

@@ -5,6 +5,8 @@ import io.cucumber.java.en.*;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -15,12 +17,14 @@ public class AddEmployeeSteps {
     private Employee employee;
     private String errorMessage;
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    public static final Map<String, Project> sharedProjects = new HashMap<>();
+
 
     @Given("a project {string} exists")
     public void aProjectExists(String projectName) {
         project = projectSystem.getProjectByName(projectName);
         if (project == null) {
-            project = projectSystem.createProject(projectName, LocalDate.now(), LocalDate.now().plusDays(30));
+            project = projectSystem.createProject(projectName, LocalDate.now(), LocalDate.now().plusDays(30), 100);
         }
     }
 

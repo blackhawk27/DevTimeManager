@@ -26,7 +26,7 @@ public class CreateActivitySteps {
     public void projectWithNameAlreadyCreated(String name) {
         currentProject = projectSystem.getProjectByName(name);
         if (currentProject == null) {
-            currentProject = projectSystem.createProject(name, LocalDate.now(), LocalDate.now().plusDays(30));
+            currentProject = projectSystem.createProject(name, LocalDate.now(), LocalDate.now().plusDays(30), 100);
         }
     }
 
@@ -79,7 +79,7 @@ public class CreateActivitySteps {
     @Given("a second project with the name {string} is created")
     public void createSecondProject(String name) {
         if (projectSystem.getProjectByName(name) == null) {
-            projectSystem.createProject(name, LocalDate.now(), LocalDate.now().plusDays(30));
+            projectSystem.createProject(name, LocalDate.now(), LocalDate.now().plusDays(30), 100);
         }
     }
 

@@ -15,7 +15,7 @@ public class CreateProjectSteps {
     private Employee employee;
     private Project createdProject;
     private String errorMessage;
-
+    private double budgetedTime;
 
     @Given("an employee with id {string} logs in to create project")
     public void anEmployeeLogsInToCreateProject(String id) {
@@ -52,9 +52,14 @@ public class CreateProjectSteps {
         tryParseDate(dateStr, false);
     }
 
+    @When("the employee inputs budgeted time {double}")
+    public void theEmployeeInputsBudgetedTime(double time) {
+        employee.inputBudgetedTime(time);
+    }
+
     private void tryParseDate(String dateStr, boolean isStartDate) {
         try {
-            // Først tjek om datoen er velformet (dd/MM/yyyy)
+            // Validate date format as dd/MM/yyyy
             if (!dateStr.matches("\\d{2}/\\d{2}/\\d{4}")) {
                 if (isStartDate) {
                     employee.inputStartDate(null);
@@ -64,13 +69,12 @@ public class CreateProjectSteps {
                 return;
             }
 
-            // Split datoen i dele for manuel validering
+            // Manual date validation (split into day, month, year)
             String[] parts = dateStr.split("/");
             int day = Integer.parseInt(parts[0]);
             int month = Integer.parseInt(parts[1]);
             int year = Integer.parseInt(parts[2]);
 
-            // Simpel validering af dage i måneder
             if (month < 1 || month > 12 || day < 1 || day > 31) {
                 if (isStartDate) {
                     employee.inputStartDate(null);
@@ -80,7 +84,6 @@ public class CreateProjectSteps {
                 return;
             }
 
-            // Mere præcis validering for måneder med 30 dage
             if ((month == 4 || month == 6 || month == 9 || month == 11) && day > 30) {
                 if (isStartDate) {
                     employee.inputStartDate(null);
@@ -90,7 +93,6 @@ public class CreateProjectSteps {
                 return;
             }
 
-            // Særlig kontrol for februar
             if (month == 2) {
                 boolean isLeapYear = (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0));
                 int maxDays = isLeapYear ? 29 : 28;
@@ -105,7 +107,6 @@ public class CreateProjectSteps {
                 }
             }
 
-            // Hvis vi kommer hertil, så er datoen valid - prøv at parse den
             LocalDate date = LocalDate.parse(dateStr, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
             if (isStartDate) {
                 employee.inputStartDate(date);
@@ -113,7 +114,6 @@ public class CreateProjectSteps {
                 employee.inputEndDate(date);
             }
         } catch (Exception e) {
-            // Håndter alle andre fejl
             if (isStartDate) {
                 employee.inputStartDate(null);
             } else {
@@ -155,5 +155,4 @@ public class CreateProjectSteps {
     public void theProjectIsNotCreated() {
         assertNull(createdProject, "Project should not have been created");
     }
-
 }

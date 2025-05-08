@@ -22,7 +22,7 @@ public class GenerateProjectReportSteps {
     @Given("a project with the title {string} exists")
     public void aProjectWithTitleExists(String projectName) {
         if (projectSystem.getProjectByName(projectName) == null) {
-            projectSystem.createProject(projectName, LocalDate.now(), LocalDate.now().plusDays(30));
+            projectSystem.createProject(projectName, LocalDate.now(), LocalDate.now().plusDays(30), 100);
         }
     }
 

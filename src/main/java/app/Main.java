@@ -3,6 +3,7 @@ package app;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
@@ -46,7 +47,7 @@ public class Main {
                     case "7" -> generateProjectReport();
                     case "8" -> assignProjectManager();
                     case "9" -> {
-                        System.out.println("Thank you for using Project System Mangement");
+                        System.out.println("Thank you for using Project System Management");
                         return;
                     }
                     default -> System.out.println("Invalid option");
@@ -77,6 +78,8 @@ public class Main {
             currentEmployee.inputStartDate(startDate);
             LocalDate endDate = LocalDate.parse(prompt("Please enter end date (dd/MM/yyyy)"), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
             currentEmployee.inputEndDate(endDate);
+            double budgetedTime = Double.parseDouble(prompt("Please enter budgeted time in hours (e.g. 120.5)"));
+            currentEmployee.inputBudgetedTime(budgetedTime);
             var project = currentEmployee.createProject(projectSystem);
             System.out.println("Project " + project.getName() + " created successfully with id " + project.getId());
         } catch (Exception e) {
@@ -108,7 +111,7 @@ public class Main {
     }
 
     private static void assignProjectManager() {
-        String projectName = prompt("Enter name");
+        String projectName = prompt("Enter project name");
         String managerId = prompt("Enter ID of the employee to assign as project manager");
 
         Project project = projectSystem.getProjectByName(projectName);
@@ -229,9 +232,77 @@ public class Main {
 
 
     private static void generateProjectReport() {
-        String activityName = prompt("Input activity name: ");
+        System.out.print("Enter project name to generate report: ");
+        String projectName = scanner.nextLine();
 
+        Project project = projectSystem.getProjectByName(projectName);
+        if (project == null) {
+            System.out.println("Error: Project not found.");
+            return;
+        }
 
+        List<Activity> activities = project.getActivities();
+
+        int totalBudgetedTime = (int) project.getBudgetedTime();;
+        int totalRegisteredTime = activities.stream().mapToInt(Activity::getRegisteredTime).sum();
+        int unallocatedHours = totalBudgetedTime - totalRegisteredTime;
+        int estimatedRemaining = Math.max(unallocatedHours, 0);
+
+        System.out.println("\n--- Project Report for '" + projectName + "' ---");
+        System.out.println("");
+        System.out.println("Project ID: " + project.getId());
+        System.out.println("Project Manager: " + project.getProjectManager());
+        System.out.println("Start Date: " + project.getStartDate());
+        System.out.println("End Date: " + project.getEndDate());
+        System.out.println();
+        System.out.println("Total Registered Hours: " + totalRegisteredTime);
+        System.out.println("Budgeted Time: " + totalBudgetedTime);
+        System.out.println("Unallocated Hours: " + unallocatedHours);
+        System.out.println("Estimated Remaining Work Time: " + estimatedRemaining);
+
+        if (totalRegisteredTime == 0) {
+            System.out.println("Warning: No work has been registered on this project yet.");
+        }
+
+        if (totalRegisteredTime > totalBudgetedTime) {
+            System.out.println("Project is over budget!");
+        } else {
+            System.out.println("Project is within budget.");
+            System.out.println("");
+        }
+
+        System.out.println("Assigned Employees:");
+        for (Employee employee : project.getEmployees()) {
+            System.out.println("- " + employee.getId() + " (" + employee.getTimeRegistry().size() + " time entries)");
+        }
+        System.out.println();
+
+        System.out.println("Activities:");
+        if (project.getActivities().isEmpty()) {
+            System.out.println("No activities assigned yet.");
+        } else {
+            for (Activity activity : project.getActivities()) {
+                System.out.println("- " + activity.getName());
+            }
+        }
+        System.out.println();
+
+        System.out.println("Time Entries:");
+        for (Employee employee : project.getEmployees()) {
+            System.out.println("  Employee: " + employee.getId());
+            for (TimeEntry timeEntry : employee.getTimeRegistry()) {
+                System.out.println("    Type: " + timeEntry.getType());
+                if (timeEntry.getType() == TimeEntry.EntryType.Work) {
+                    System.out.println("    Project: " + timeEntry.getProjectName());
+                    System.out.println("    Activity: " + timeEntry.getActivityName());
+                    System.out.println("    Start: " + timeEntry.getStartDateTime() + " End: " + timeEntry.getEndDateTime());
+                    System.out.println("    Duration: " + timeEntry.getWorkDurationInHours() + " hours");
+                } else {
+                    System.out.println("    Start: " + timeEntry.getStartDate() + " End: " + timeEntry.getEndDate());
+                }
+            }
+        }
+        System.out.println();
     }
 
     private static String prompt(String message) {
