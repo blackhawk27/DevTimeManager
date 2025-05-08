@@ -63,6 +63,11 @@ public class Project {
     }
 
     public String generateReport() {
+
+        // Preconditions
+        assert this.name != null && !this.name.trim().isEmpty() : "Project name cannot be null or empty";
+
+
         StringBuilder report = new StringBuilder();
 
         double totalBudgetedTime = (double) this.getBudgetedTime();
@@ -81,7 +86,7 @@ public class Project {
         report.append("Project ID: ").append(this.getId()).append("\n");
         report
             .append("Project Manager: ")
-            .append(this.getProjectManager())
+            .append(this.getProjectManager().getId())
             .append("\n");
         report.append("Start Date: ").append(this.getStartDate()).append("\n");
         report.append("End Date: ").append(this.getEndDate()).append("\n\n");
@@ -170,6 +175,11 @@ public class Project {
             }
         }
         report.append("\n");
+
+        // Postconditions
+        assert !report.isEmpty() : "Generated report is empty";
+        assert report.toString().contains("Project ID:") : "Report does not contain project ID";
+
 
         return report.toString();
     }
