@@ -7,22 +7,27 @@ import java.util.List;
 import java.util.Map;
 
 public class ProjectSystem {
+
     private int projectCounter = 1;
-    private int activityCounter = 1;  // fx i ProjectSystem
+    private int activityCounter = 1; // fx i ProjectSystem
 
     private List<Project> projects = new ArrayList<>();
     private Map<String, Employee> employees = new HashMap<>();
-
-
 
     public ProjectSystem() {
         // initialiser dine lister over projekter, medarbejdere osv.
     }
 
-
-    public Project createProject(String name, LocalDate start, LocalDate end, double budgetedTime) {
-        if(getProjectByName(name) != null){
-            throw new IllegalArgumentException("Project already exists. New project has not been created.");
+    public Project createProject(
+        String name,
+        LocalDate start,
+        LocalDate end,
+        double budgetedTime
+    ) {
+        if (getProjectByName(name) != null) {
+            throw new IllegalArgumentException(
+                "Project already exists. New project has not been created."
+            );
         }
 
         String id = generateProjectID();
@@ -32,21 +37,24 @@ public class ProjectSystem {
     }
 
     private String generateProjectID() {
-        String year = LocalDate.now().getYear()%100 + "";
+        String year = (LocalDate.now().getYear() % 100) + "";
         String id = year + String.format("%03d", projectCounter++);
         return id;
     }
-
-
 
     public String generateActivityID() {
         return "A" + String.format("%03d", activityCounter++);
     }
 
-
     public Project getProjectByName(String name) {
+        if (name == null || name.trim().isEmpty()) {
+            throw new IllegalArgumentException(
+                "Project name cannot be null or empty"
+            );
+        }
+
         for (Project project : projects) {
-            if (project.getName().equals(name)) {
+            if (project.getName().equalsIgnoreCase(name.trim())) {
                 return project;
             }
         }
@@ -58,12 +66,16 @@ public class ProjectSystem {
      */
     public void addEmployee(String employeeId, String projectName) {
         if (!isRegistered(employeeId)) {
-            throw new IllegalArgumentException("Employee with ID " + employeeId + " does not exist");
+            throw new IllegalArgumentException(
+                "Employee with ID " + employeeId + " does not exist"
+            );
         }
 
         Project project = getProjectByName(projectName);
         if (project == null) {
-            throw new IllegalArgumentException("Project with ID " + projectName + " does not exist");
+            throw new IllegalArgumentException(
+                "Project with ID " + projectName + " does not exist"
+            );
         }
 
         Employee employee = getEmployeeById(employeeId);
@@ -77,14 +89,23 @@ public class ProjectSystem {
     /**
      * Adds an employee to a project and an activity.
      */
-    public void addEmployee(String employeeId, String projectName, String activityName) {
+    public void addEmployee(
+        String employeeId,
+        String projectName,
+        String activityName
+    ) {
         // Først sikre at medarbejderen er på projektet – uden duplikat
         addEmployee(employeeId, projectName);
 
         Project project = getProjectByName(projectName);
         Activity activity = project.getActivityByName(activityName);
         if (activity == null) {
-            throw new IllegalArgumentException("Activity " + activityName + " not found in project " + projectName);
+            throw new IllegalArgumentException(
+                "Activity " +
+                activityName +
+                " not found in project " +
+                projectName
+            );
         }
 
         Employee employee = getEmployeeById(employeeId);
@@ -99,8 +120,8 @@ public class ProjectSystem {
         return employees.containsKey(id);
     }
 
-    public void registerEmployee(String id){
-        employees.put(id ,new Employee(id));
+    public void registerEmployee(String id) {
+        employees.put(id, new Employee(id));
     }
 
     public Employee getEmployeeById(String id) {
@@ -120,5 +141,3 @@ public class ProjectSystem {
         return null;
     }
 }
-
-
