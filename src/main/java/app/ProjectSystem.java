@@ -24,6 +24,15 @@ public class ProjectSystem {
         LocalDate end,
         double budgetedTime
     ) {
+
+        // Preconditions
+        assert name != null && !name.trim().isEmpty() : "Project name cannot be null or empty";
+        assert start != null : "Start date cannot be null";
+        assert end != null : "End date cannot be null";
+        assert !start.isAfter(end) : "Start date must be before or equal to end date";
+        assert budgetedTime > 0 : "Budgeted time must be a positive number";
+        assert getProjectByName(name) == null : "Project with the same name already exists";
+
         if (getProjectByName(name) != null) {
             throw new IllegalArgumentException(
                 "Project already exists. New project has not been created."
@@ -33,6 +42,12 @@ public class ProjectSystem {
         String id = generateProjectID();
         Project project = new Project(name, id, start, end, budgetedTime);
         projects.add(project);
+
+        // Postconditions
+        assert projects.contains(project) : "Project was not added successfully";
+        assert project.getId() != null && !project.getId().trim().isEmpty() : "Project ID is invalid";
+
+
         return project;
     }
 
@@ -89,32 +104,17 @@ public class ProjectSystem {
     /**
      * Adds an employee to a project and an activity.
      */
-    public void addEmployee(
-        String employeeId,
-        String projectName,
-        String activityName
-    ) {
-        // Først sikre at medarbejderen er på projektet – uden duplikat
-        addEmployee(employeeId, projectName);
-
+    public void addEmployee(String employeeId, String projectName, String activityName) {
+        Employee employee = getEmployeeById(employeeId);
         Project project = getProjectByName(projectName);
         Activity activity = project.getActivityByName(activityName);
         if (activity == null) {
-            throw new IllegalArgumentException(
-                "Activity " +
-                activityName +
-                " not found in project " +
-                projectName
-            );
+            throw new IllegalArgumentException("Activity " + activityName + " not found in project " + projectName);
         }
 
-        Employee employee = getEmployeeById(employeeId);
-
-        // Undgå at tilføje medarbejderen flere gange til samme aktivitet
-        if (!activity.isEmployeeAssigned(employee)) {
-            activity.assignEmployee(employee); // Aktiviteten håndterer sine egne regler (fx max 10 aktiviteter)
-        }
+        activity.assignEmployee(employee);
     }
+
 
     public boolean isRegistered(String id) {
         return employees.containsKey(id);

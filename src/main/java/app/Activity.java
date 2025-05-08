@@ -12,7 +12,7 @@ public class Activity {
     private final LocalDate endDate;
     private final List<Employee> assignedEmployees = new ArrayList<>();
     private final List<TimeEntry> workEntries = new ArrayList<>();
-    private int budgetedTime = 0;
+    private Double budgetedTime = 0.0;
 
     public Activity(String id, String name, LocalDate startDate, LocalDate endDate) {
         this.id = id;
@@ -20,8 +20,6 @@ public class Activity {
         this.startDate = startDate;
         this.endDate = endDate;
     }
-
-
 
     public String getId() {
         return id;
@@ -54,11 +52,11 @@ public class Activity {
         return assignedEmployees.contains(employee);
     }
 
-    public void setBudgetedTime(int budgetedTime) {
+    public void setBudgetedTime(Double budgetedTime) {
         this.budgetedTime = budgetedTime;
     }
 
-    public int getBudgetedTime() {
+    public Double getBudgetedTime() {
         return budgetedTime;
     }
 
@@ -69,8 +67,8 @@ public class Activity {
         workEntries.add(entry);
     }
 
-    public int getRegisteredTime() {
-        return (int) workEntries.stream()
+    public double getRegisteredTime() {
+        return workEntries.stream()
                 .mapToDouble(TimeEntry::getWorkDurationInHours)
                 .sum();
     }

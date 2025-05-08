@@ -16,7 +16,7 @@ class ProjectJUnitTest {
 
     @BeforeEach
     void init() {
-        p = new Project("X", "0001", LocalDate.now(), LocalDate.now().plusDays(1), 120);
+        p = new Project("X", "0001", LocalDate.now(), LocalDate.now().plusDays(1), 120.0);
         e1 = new Employee("huba");
         pm = new ProjectManager("huba");
         p.addEmployee(e1);

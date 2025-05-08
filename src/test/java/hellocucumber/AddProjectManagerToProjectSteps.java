@@ -42,7 +42,7 @@ public class AddProjectManagerToProjectSteps {
 
     @And("no Project Manager is assigned to {string}")
     public void noProjectManagerIsAssignedTo(String projectName) {
-        project.setProjectManager(null);  // Assumes Project has setProjectManager method
+        project.setProjectManager(null);
     }
 
     @When("{string} assigns {string} as project manager to {string}")
@@ -83,7 +83,6 @@ public class AddProjectManagerToProjectSteps {
         String projectId = "0001";  // Example project ID
         project = new Project(projectName, projectId, startDate, endDate, 0.0);
 
-        // Assign the project manager
         ProjectManager manager = new ProjectManager(managerId);
         project.setProjectManager(manager);
         manager.addProject(project);
@@ -94,6 +93,11 @@ public class AddProjectManagerToProjectSteps {
         // Set up the assigning employee and the new project manager
         Employee assigningEmployee = new Employee(assigningEmployeeId);
         ProjectManager newManager = new ProjectManager(newManagerId);
+
+        // Ensure the assigning employee is part of the project
+        if (!project.getEmployees().contains(assigningEmployee)) {
+            project.addEmployee(assigningEmployee);
+        }
 
         try {
             // Try assigning project manager

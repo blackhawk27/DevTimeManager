@@ -16,6 +16,7 @@ public class Main {
         projectSystem.registerEmployee("teem");
         projectSystem.registerEmployee("huba");
         projectSystem.registerEmployee("pby");
+        projectSystem.registerEmployee("maes");
 
         // Pre-create a project named "p1"
         Project defaultProject = projectSystem.createProject(
@@ -94,6 +95,7 @@ public class Main {
                 }
             } catch (RuntimeException e) {
                 System.out.println("Returning to main menu...");
+                System.out.println("Reason: " + e.getMessage());
             }
         }
     }
@@ -119,20 +121,35 @@ public class Main {
                 "Please enter your project name (ex. Greg's Website)"
             );
             currentEmployee.inputProjectName(projectName);
+
             LocalDate startDate = LocalDate.parse(
                 prompt("Please enter start date (dd/MM/yyyy)"),
                 DateTimeFormatter.ofPattern("dd/MM/yyyy")
             );
             currentEmployee.inputStartDate(startDate);
+
             LocalDate endDate = LocalDate.parse(
                 prompt("Please enter end date (dd/MM/yyyy)"),
                 DateTimeFormatter.ofPattern("dd/MM/yyyy")
             );
             currentEmployee.inputEndDate(endDate);
-            double budgetedTime = Double.parseDouble(
-                prompt("Please enter budgeted time in hours (e.g. 120.5)")
+
+            String budgetInput = prompt(
+                "Please enter budgeted time in hours (e.g. 120.5):"
             );
-            currentEmployee.inputBudgetedTime(budgetedTime);
+            if (budgetInput.isBlank()) {
+                currentEmployee.inputBudgetedTime(null); // This lets Employee handle null and throw the friendly message
+            } else {
+                try {
+                    Double budgetedTime = Double.parseDouble(budgetInput);
+                    currentEmployee.inputBudgetedTime(budgetedTime);
+                } catch (NumberFormatException e) {
+                    throw new IllegalArgumentException(
+                        "Budgeted time must be a valid number."
+                    );
+                }
+            }
+
             var project = currentEmployee.createProject(projectSystem);
             System.out.println(
                 "Project " +
@@ -237,7 +254,11 @@ public class Main {
                 return;
             }
             if (!project.getEmployees().contains(currentEmployee)) {
-                System.out.println("Error: " + currentEmployee.getId() + " is not registered as an employee.");
+                System.out.println(
+                    "Error: " +
+                    currentEmployee.getId() +
+                    " is not registered as an employee."
+                );
                 return;
             }
             //-----------------------------------------------------------
@@ -376,101 +397,8 @@ public class Main {
             return;
         }
 
-        List<Activity> activities = project.getActivities();
-
-        int totalBudgetedTime = (int) project.getBudgetedTime();
-        int totalRegisteredTime = activities
-            .stream()
-            .mapToInt(Activity::getRegisteredTime)
-            .sum();
-        int unallocatedHours = totalBudgetedTime - totalRegisteredTime;
-        int estimatedRemaining = Math.max(unallocatedHours, 0);
-
-        System.out.println(
-            "\n--- Project Report for '" + projectName + "' ---"
-        );
-        System.out.println("");
-        System.out.println("Project ID: " + project.getId());
-        System.out.println("Project Manager: " + project.getProjectManager());
-        System.out.println("Start Date: " + project.getStartDate());
-        System.out.println("End Date: " + project.getEndDate());
-        System.out.println();
-        System.out.println("Total Registered Hours: " + totalRegisteredTime);
-        System.out.println("Budgeted Time: " + totalBudgetedTime);
-        System.out.println("Unallocated Hours: " + unallocatedHours);
-        System.out.println(
-            "Estimated Remaining Work Time: " + estimatedRemaining
-        );
-
-        if (totalRegisteredTime == 0) {
-            System.out.println(
-                "Warning: No work has been registered on this project yet."
-            );
-        }
-
-        if (totalRegisteredTime > totalBudgetedTime) {
-            System.out.println("Project is over budget!");
-        } else {
-            System.out.println("Project is within budget.");
-            System.out.println("");
-        }
-
-        System.out.println("Assigned Employees:");
-        for (Employee employee : project.getEmployees()) {
-            System.out.println(
-                "- " +
-                employee.getId() +
-                " (" +
-                employee.getTimeRegistry().size() +
-                " time entries)"
-            );
-        }
-        System.out.println();
-
-        System.out.println("Activities:");
-        if (project.getActivities().isEmpty()) {
-            System.out.println("No activities assigned yet.");
-        } else {
-            for (Activity activity : project.getActivities()) {
-                System.out.println("- " + activity.getName());
-            }
-        }
-        System.out.println();
-
-        System.out.println("Time Entries:");
-        for (Employee employee : project.getEmployees()) {
-            System.out.println("  Employee: " + employee.getId());
-            for (TimeEntry timeEntry : employee.getTimeRegistry()) {
-                System.out.println("    Type: " + timeEntry.getType());
-                if (timeEntry.getType() == TimeEntry.EntryType.Work) {
-                    System.out.println(
-                        "    Project: " + timeEntry.getProjectName()
-                    );
-                    System.out.println(
-                        "    Activity: " + timeEntry.getActivityName()
-                    );
-                    System.out.println(
-                        "    Start: " +
-                        timeEntry.getStartDateTime() +
-                        " End: " +
-                        timeEntry.getEndDateTime()
-                    );
-                    System.out.println(
-                        "    Duration: " +
-                        timeEntry.getWorkDurationInHours() +
-                        " hours"
-                    );
-                } else {
-                    System.out.println(
-                        "    Start: " +
-                        timeEntry.getStartDate() +
-                        " End: " +
-                        timeEntry.getEndDate()
-                    );
-                }
-            }
-        }
-        System.out.println();
+        // Call the generateReport method in the Project class
+        System.out.println(project.generateReport());
     }
 
     private static String prompt(String message) {
