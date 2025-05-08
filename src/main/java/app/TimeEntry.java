@@ -18,6 +18,9 @@ public class TimeEntry {
 
     // Constructor for Work
     public TimeEntry(EntryType type, LocalDateTime start, LocalDateTime end, String projectName, String activityName) {
+        if (end.isBefore(start)) {
+            throw new IllegalArgumentException("End time must be after start time for work entry.");
+        }
         this.type = type;
         this.startDateTime = start;
         this.endDateTime = end;
@@ -29,6 +32,9 @@ public class TimeEntry {
 
     // Constructor for non-Work (FreeTime, Course, SickDay)
     public TimeEntry(EntryType type, LocalDate startDate, LocalDate endDate) {
+        if (endDate.isBefore(startDate)) {
+            throw new IllegalArgumentException("End date must be after start date for non-work entry.");
+        }
         this.type = type;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -71,4 +77,3 @@ public class TimeEntry {
         return (double) java.time.Duration.between(startDateTime, endDateTime).toMinutes() / 60.0;
     }
 }
-
