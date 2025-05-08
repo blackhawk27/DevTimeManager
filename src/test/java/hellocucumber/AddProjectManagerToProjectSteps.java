@@ -94,6 +94,11 @@ public class AddProjectManagerToProjectSteps {
         Employee assigningEmployee = new Employee(assigningEmployeeId);
         ProjectManager newManager = new ProjectManager(newManagerId);
 
+        // Ensure the assigning employee is part of the project
+        if (!project.getEmployees().contains(assigningEmployee)) {
+            project.addEmployee(assigningEmployee);
+        }
+
         try {
             // Try assigning project manager
             project.assignProjectManager(assigningEmployee, newManager);
