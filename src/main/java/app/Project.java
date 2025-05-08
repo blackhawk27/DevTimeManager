@@ -65,14 +65,14 @@ public class Project {
     public String generateReport() {
         StringBuilder report = new StringBuilder();
 
-        int totalBudgetedTime = (int) this.getBudgetedTime();
-        int totalRegisteredTime =
+        double totalBudgetedTime = (double) this.getBudgetedTime();
+        double totalRegisteredTime =
             this.getActivities()
                 .stream()
-                .mapToInt(Activity::getRegisteredTime)
+                .mapToDouble(Activity::getRegisteredTime)
                 .sum();
-        int unallocatedHours = totalBudgetedTime - totalRegisteredTime;
-        int estimatedRemaining = Math.max(unallocatedHours, 0);
+        double unallocatedHours = totalBudgetedTime - totalRegisteredTime;
+        double estimatedRemaining = Math.max(unallocatedHours, 0);
 
         report
             .append("\n--- Project Report for '")
