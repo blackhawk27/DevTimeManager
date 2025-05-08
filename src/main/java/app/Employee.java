@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Employee {
+
     public boolean loggedIn;
     private final String id;
     private String tempProjectName;
@@ -14,9 +15,11 @@ public class Employee {
     private LocalDate tempEndDate;
     private double budgetedTime;
     private int assignedActivitiesCount = 0;
-    private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy-HH:mm");
-    private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-
+    private final DateTimeFormatter dateTimeFormatter =
+        DateTimeFormatter.ofPattern("dd/MM/yyyy-HH:mm");
+    private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(
+        "dd/MM/yyyy"
+    );
 
     private final List<TimeEntry> timeRegistry = new ArrayList<>();
 
@@ -24,26 +27,24 @@ public class Employee {
         return timeRegistry;
     }
 
-
     public Employee(String id) {
         this.id = id;
         this.loggedIn = false;
     }
 
-
-    public void logIn(){
+    public void logIn() {
         this.loggedIn = true;
     }
 
-    public void logOut(){
+    public void logOut() {
         this.loggedIn = false;
     }
 
-    public boolean isLoggedIn(){
+    public boolean isLoggedIn() {
         return this.loggedIn;
     }
 
-    public String getId(){
+    public String getId() {
         return this.id;
     }
 
@@ -65,26 +66,41 @@ public class Employee {
 
     public Project createProject(ProjectSystem system) {
         if (!loggedIn) {
-            throw new IllegalArgumentException("Employee must be logged in to create a project.");
+            throw new IllegalArgumentException(
+                "Employee must be logged in to create a project."
+            );
         }
 
         if (tempProjectName == null || tempProjectName.trim().isEmpty()) {
-            throw new IllegalArgumentException("Project name missing. Project has not been created.");
+            throw new IllegalArgumentException(
+                "Project name missing. Project has not been created."
+            );
         }
 
         if (tempStartDate == null) {
-            throw new IllegalArgumentException("Invalid date format. Project has not been created.");
+            throw new IllegalArgumentException(
+                "Invalid date format. Project has not been created."
+            );
         }
 
         if (tempEndDate == null) {
-            throw new IllegalArgumentException("Invalid date format. Project has not been created.");
+            throw new IllegalArgumentException(
+                "Invalid date format. Project has not been created."
+            );
         }
 
         if (tempStartDate.isAfter(tempEndDate)) {
-            throw new IllegalArgumentException("Start date must be before or equal to end date. Project has not been created.");
+            throw new IllegalArgumentException(
+                "Start date must be before or equal to end date. Project has not been created."
+            );
         }
 
-        return system.createProject(tempProjectName, tempStartDate, tempEndDate, budgetedTime);
+        return system.createProject(
+            tempProjectName,
+            tempStartDate,
+            tempEndDate,
+            budgetedTime
+        );
     }
 
     public boolean canTakeMoreActivities() {
@@ -95,7 +111,13 @@ public class Employee {
         assignedActivitiesCount++;
     }
 
-    public String registerTime(String type, ArrayList<String> date, String projectName, String activityName, ProjectSystem system) {
+    public String registerTime(
+        String type,
+        ArrayList<String> date,
+        String projectName,
+        String activityName,
+        ProjectSystem system
+    ) {
         if (!loggedIn) {
             throw new IllegalStateException("Bruger ikke logget ind");
         }
@@ -108,7 +130,9 @@ public class Employee {
         }
 
         if (date == null || date.size() != 2) {
-            throw new IllegalArgumentException("Dato skal indeholde præcis to elementer");
+            throw new IllegalArgumentException(
+                "Dato skal indeholde præcis to elementer"
+            );
         }
 
         if (entryType == TimeEntry.EntryType.Work) {
@@ -117,37 +141,64 @@ public class Employee {
             LocalDateTime end = parseDateTime(date.get(1));
 
             if (!start.toLocalDate().equals(end.toLocalDate())) {
-                throw new IllegalArgumentException("Arbejdstid skal være på samme dato");
+                throw new IllegalArgumentException(
+                    "Arbejdstid skal være på samme dato"
+                );
             }
 
-            double duration = (double) java.time.Duration.between(start, end).toMinutes() / 60.0;
+            double duration =
+                (double) java.time.Duration.between(start, end).toMinutes() /
+                60.0;
             if (duration <= 0 || duration > 24 || duration % 0.5 != 0) {
                 throw new IllegalArgumentException("Ugyldig arbejdstid");
             }
 
             Project project = system.getProjectByName(projectName);
-            if (project == null) throw new IllegalArgumentException("Projekt eller aktivitet ikke fundet");
+            if (project == null) throw new IllegalArgumentException(
+                "Projekt eller aktivitet ikke fundet"
+            );
 
             Activity activity = project.getActivityByName(activityName);
-            if (activity == null || !activity.isEmployeeAssigned(this)) {
-                throw new IllegalArgumentException("Projekt eller aktivitet ikke fundet");
+            if (activity == null) {
+                throw new IllegalArgumentException(
+                    "Activity not found in project"
+                );
+            }
+            if (!activity.isEmployeeAssigned(this)) {
+                throw new IllegalArgumentException(
+                    "Employee is not assigned to the activity"
+                );
             }
 
             // Før du tilføjer ny entry, fjern gammel både fra employee og activity
-            timeRegistry.removeIf(e ->
+            timeRegistry.removeIf(
+                e ->
                     e.getType() == TimeEntry.EntryType.Work &&
-                            e.getStartDateTime().toLocalDate().equals(start.toLocalDate()) &&
-                            e.getProjectName().equals(projectName) &&
-                            e.getActivityName().equals(activityName)
+                    e
+                        .getStartDateTime()
+                        .toLocalDate()
+                        .equals(start.toLocalDate()) &&
+                    e.getProjectName().equals(projectName) &&
+                    e.getActivityName().equals(activityName)
             );
 
-            activity.removeWorkEntryIf(entry ->
-                    entry.getStartDateTime().toLocalDate().equals(start.toLocalDate()) &&
-                            entry.getProjectName().equals(projectName) &&
-                            entry.getActivityName().equals(activityName)
+            activity.removeWorkEntryIf(
+                entry ->
+                    entry
+                        .getStartDateTime()
+                        .toLocalDate()
+                        .equals(start.toLocalDate()) &&
+                    entry.getProjectName().equals(projectName) &&
+                    entry.getActivityName().equals(activityName)
             );
 
-            TimeEntry newEntry = new TimeEntry(entryType, start, end, projectName, activityName);
+            TimeEntry newEntry = new TimeEntry(
+                entryType,
+                start,
+                end,
+                projectName,
+                activityName
+            );
             timeRegistry.add(newEntry);
             activity.addWorkEntry(newEntry);
             return "Registrering gennemført";
@@ -157,14 +208,21 @@ public class Employee {
             LocalDate end = parseDate(date.get(1));
 
             if (start.isAfter(end)) {
-                throw new IllegalArgumentException("Startdato må ikke være efter slutdato");
+                throw new IllegalArgumentException(
+                    "Startdato må ikke være efter slutdato"
+                );
             }
 
             // Tjek for overlap
             for (TimeEntry entry : timeRegistry) {
                 if (entry.getType() == entryType) {
-                    if (!entry.getEndDate().isBefore(start) && !entry.getStartDate().isAfter(end)) {
-                        throw new IllegalArgumentException("Overlapping time registration");
+                    if (
+                        !entry.getEndDate().isBefore(start) &&
+                        !entry.getStartDate().isAfter(end)
+                    ) {
+                        throw new IllegalArgumentException(
+                            "Overlapping time registration"
+                        );
                     }
                 }
             }
@@ -175,12 +233,13 @@ public class Employee {
         }
     }
 
-
     private LocalDateTime parseDateTime(String input) {
         try {
             return LocalDateTime.parse(input, dateTimeFormatter);
         } catch (Exception e) {
-            throw new IllegalArgumentException("Invalid datetime format (dd/MM/yyyy-HH:mm)");
+            throw new IllegalArgumentException(
+                "Invalid datetime format (dd/MM/yyyy-HH:mm)"
+            );
         }
     }
 
@@ -188,8 +247,9 @@ public class Employee {
         try {
             return LocalDate.parse(input, dateFormatter);
         } catch (Exception e) {
-            throw new IllegalArgumentException("Invalid date format (dd/MM/yyyy)");
+            throw new IllegalArgumentException(
+                "Invalid date format (dd/MM/yyyy)"
+            );
         }
     }
-
 }
