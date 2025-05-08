@@ -20,7 +20,7 @@ public class EmployeeJUnitTest {
         projSys.registerEmployee("E1");
         emp = projSys.getEmployeeById("E1");
 
-        // Opret projekt
+        // Opretter projektet gennem ProjectSystem
         proj = projSys.createProject("P1", LocalDate.now(), LocalDate.now().plusDays(5), 50.0);
 
         // Opret aktivitet og tilføj til projektet
@@ -29,7 +29,11 @@ public class EmployeeJUnitTest {
 
         // Tildel medarbejderen til projektet
         projSys.addEmployee("E1", "P1");
+
+        // Tildel medarbejderen til aktiviteten ved brug af aktivitetsnavnet
+        projSys.addEmployee("E1", "P1", "Development");
     }
+
 
 
 
@@ -68,13 +72,23 @@ public class EmployeeJUnitTest {
     @Test
     void registerWorkTimeSuccessfully() {
         emp.logIn();
+
         ArrayList<String> workTime = new ArrayList<>();
         workTime.add("08/05/2025-09:00");
         workTime.add("08/05/2025-12:00");
 
-        String response = emp.registerTime("Work", workTime, "P1", "A1", projSys);
+        // Verificer, at projektet og aktiviteten eksisterer
+        Project project = projSys.getProjectByName("P1");
+        assertNotNull(project, "Project P1 should exist");
+
+        Activity activity = project.getActivityByName("Development");
+        assertNotNull(activity, "Activity Development should exist");
+
+        // Registrer arbejdstid
+        String response = emp.registerTime("Work", workTime, "P1", "Development", projSys);
         assertEquals("Registration completed", response);
     }
+
 
     @Test
     void registerTimeForUnassignedActivity() {
