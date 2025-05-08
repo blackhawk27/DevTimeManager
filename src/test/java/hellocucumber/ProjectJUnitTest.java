@@ -61,4 +61,10 @@ class ProjectJUnitTest {
         p.addActivity(a);
         assertEquals(p.getActivities(), List.of(a));
     }
+
+    @Test
+    void getBudgetedTime() {
+        // this is the new test for your budgetedTime field
+        assertEquals(120, p.getBudgetedTime(), "budgetedTime should match constructor");
+    }
 }

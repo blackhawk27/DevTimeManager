@@ -52,30 +52,6 @@ public class Project {
         return budgetedTime;
     }
 
-    public void setBudgetedTime(double budgetedTime) {
-        this.budgetedTime = budgetedTime;
-    }
-
-    public double getTotalBudgetedTime() {
-        return activities.stream()
-                .mapToDouble(Activity::getBudgetedTime)
-                .sum();
-    }
-//
-//    public double calculateActualTimeUsed() {
-//        double totalTime = 0;
-//
-//        // Iterate over each employee and their time entries
-//        for (Employee employee : employees) {
-//            for (TimeEntry timeEntry : employee.getTimeRegistry()) {
-//                // Only calculate work time entries
-//                if (timeEntry.getType() == TimeEntry.EntryType.Work) {
-//                    totalTime += timeEntry.getWorkDurationInHours();
-//                }
-//            }
-//        }
-//        return totalTime;
-//    }
 
     public List<Employee> getEmployees() {
         return new ArrayList<>(employees);
