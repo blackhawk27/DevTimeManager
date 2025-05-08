@@ -24,6 +24,15 @@ public class ProjectSystem {
         LocalDate end,
         double budgetedTime
     ) {
+
+        // Preconditions
+        assert name != null && !name.trim().isEmpty() : "Project name cannot be null or empty";
+        assert start != null : "Start date cannot be null";
+        assert end != null : "End date cannot be null";
+        assert !start.isAfter(end) : "Start date must be before or equal to end date";
+        assert budgetedTime > 0 : "Budgeted time must be a positive number";
+        assert getProjectByName(name) == null : "Project with the same name already exists";
+
         if (getProjectByName(name) != null) {
             throw new IllegalArgumentException(
                 "Project already exists. New project has not been created."
@@ -33,6 +42,12 @@ public class ProjectSystem {
         String id = generateProjectID();
         Project project = new Project(name, id, start, end, budgetedTime);
         projects.add(project);
+
+        // Postconditions
+        assert projects.contains(project) : "Project was not added successfully";
+        assert project.getId() != null && !project.getId().trim().isEmpty() : "Project ID is invalid";
+
+
         return project;
     }
 
