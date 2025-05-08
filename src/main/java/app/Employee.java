@@ -112,15 +112,18 @@ public class Employee {
     }
 
     public String registerTime(
-        String type,
-        ArrayList<String> date,
-        String projectName,
-        String activityName,
-        ProjectSystem system
+            String type,
+            ArrayList<String> date,
+            String projectName,
+            String activityName,
+            ProjectSystem system
     ) {
-        if (!loggedIn) {
-            throw new IllegalStateException("Bruger ikke logget ind");
-        }
+        // Preconditions
+        assert loggedIn : "Precondition failed: Employee must be logged in";
+        assert type != null : "Precondition failed: Type must not be null";
+        assert date != null : "Precondition failed: Date list must not be null";
+        assert date.size() == 2 : "Precondition failed: Date list must contain exactly two elements";
+        assert system != null : "Precondition failed: System must not be null";
 
         TimeEntry.EntryType entryType;
         try {
@@ -129,106 +132,84 @@ public class Employee {
             throw new IllegalArgumentException("Ugyldig tidstype");
         }
 
-        if (date == null || date.size() != 2) {
-            throw new IllegalArgumentException(
-                "Dato skal indeholde præcis to elementer"
-            );
-        }
-
         if (entryType == TimeEntry.EntryType.Work) {
-            // Format: "YYYY-MM-DD-HH:mm"
             LocalDateTime start = parseDateTime(date.get(0));
             LocalDateTime end = parseDateTime(date.get(1));
 
-            if (!start.toLocalDate().equals(end.toLocalDate())) {
-                throw new IllegalArgumentException(
-                    "Arbejdstid skal være på samme dato"
-                );
-            }
+            assert start.toLocalDate().equals(end.toLocalDate()) :
+                    "Precondition failed: Work entries must be on the same date";
 
-            double duration =
-                (double) java.time.Duration.between(start, end).toMinutes() /
-                60.0;
-            if (duration <= 0 || duration > 24 || duration % 0.5 != 0) {
-                throw new IllegalArgumentException("Ugyldig arbejdstid");
-            }
+            double duration = (double) java.time.Duration.between(start, end).toMinutes() / 60.0;
+            assert duration > 0 && duration <= 24 && duration % 0.5 == 0 :
+                    "Precondition failed: Duration must be between 0 and 24 hours in 0.5 hour increments";
 
             Project project = system.getProjectByName(projectName);
-            if (project == null) throw new IllegalArgumentException(
-                "Projekt eller aktivitet ikke fundet"
-            );
+            assert project != null : "Precondition failed: Project must exist";
 
             Activity activity = project.getActivityByName(activityName);
-            if (activity == null) {
-                throw new IllegalArgumentException(
-                    "Activity not found in project"
-                );
-            }
-            if (!activity.isEmployeeAssigned(this)) {
-                throw new IllegalArgumentException(
-                    "Employee is not assigned to the activity"
-                );
-            }
+            assert activity != null : "Precondition failed: Activity must exist";
+            assert activity.isEmployeeAssigned(this) :
+                    "Precondition failed: Employee must be assigned to the activity";
 
-            // Før du tilføjer ny entry, fjern gammel både fra employee og activity
             timeRegistry.removeIf(
-                e ->
-                    e.getType() == TimeEntry.EntryType.Work &&
-                    e
-                        .getStartDateTime()
-                        .toLocalDate()
-                        .equals(start.toLocalDate()) &&
-                    e.getProjectName().equals(projectName) &&
-                    e.getActivityName().equals(activityName)
+                    e -> e.getType() == TimeEntry.EntryType.Work &&
+                            e.getStartDateTime().toLocalDate().equals(start.toLocalDate()) &&
+                            e.getProjectName().equals(projectName) &&
+                            e.getActivityName().equals(activityName)
             );
 
             activity.removeWorkEntryIf(
-                entry ->
-                    entry
-                        .getStartDateTime()
-                        .toLocalDate()
-                        .equals(start.toLocalDate()) &&
-                    entry.getProjectName().equals(projectName) &&
-                    entry.getActivityName().equals(activityName)
+                    entry -> entry.getStartDateTime().toLocalDate().equals(start.toLocalDate()) &&
+                            entry.getProjectName().equals(projectName) &&
+                            entry.getActivityName().equals(activityName)
             );
 
-            TimeEntry newEntry = new TimeEntry(
-                entryType,
-                start,
-                end,
-                projectName,
-                activityName
-            );
+            TimeEntry newEntry = new TimeEntry(entryType, start, end, projectName, activityName);
             timeRegistry.add(newEntry);
             activity.addWorkEntry(newEntry);
+
+            // Postconditions
+            boolean existsInEmployee = timeRegistry.stream().anyMatch(e ->
+                    e.getType() == TimeEntry.EntryType.Work &&
+                            e.getStartDateTime().toLocalDate().equals(start.toLocalDate()) &&
+                            e.getProjectName().equals(projectName) &&
+                            e.getActivityName().equals(activityName)
+            );
+            assert existsInEmployee : "Postcondition failed: Time entry should be in employee's registry";
+
+            boolean existsInActivity = activity.getWorkEntries().stream().anyMatch(e ->
+                    e.getStartDateTime().toLocalDate().equals(start.toLocalDate()) &&
+                            e.getProjectName().equals(projectName) &&
+                            e.getActivityName().equals(activityName)
+            );
+            assert existsInActivity : "Postcondition failed: Time entry should be in activity's registry";
+
             return "Registrering gennemført";
         } else {
-            // Format: "YYYY-MM-DD"
             LocalDate start = parseDate(date.get(0));
             LocalDate end = parseDate(date.get(1));
 
-            if (start.isAfter(end)) {
-                throw new IllegalArgumentException(
-                    "Startdato må ikke være efter slutdato"
-                );
-            }
+            assert !start.isAfter(end) : "Precondition failed: Start date must not be after end date";
 
-            // Tjek for overlap
             for (TimeEntry entry : timeRegistry) {
                 if (entry.getType() == entryType) {
-                    if (
-                        !entry.getEndDate().isBefore(start) &&
-                        !entry.getStartDate().isAfter(end)
-                    ) {
-                        throw new IllegalArgumentException(
-                            "Overlapping time registration"
-                        );
+                    if (!entry.getEndDate().isBefore(start) && !entry.getStartDate().isAfter(end)) {
+                        throw new IllegalArgumentException("Overlapping time registration");
                     }
                 }
             }
 
             TimeEntry newEntry = new TimeEntry(entryType, start, end);
             timeRegistry.add(newEntry);
+
+            // Postcondition
+            boolean exists = timeRegistry.stream().anyMatch(e ->
+                    e.getType() == entryType &&
+                            !e.getEndDate().isBefore(start) &&
+                            !e.getStartDate().isAfter(end)
+            );
+            assert exists : "Postcondition failed: Absence entry should be in employee's registry";
+
             return "Fravær registreret";
         }
     }
