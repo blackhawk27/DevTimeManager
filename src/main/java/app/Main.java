@@ -83,6 +83,7 @@ public class Main {
                         case "7" -> generateProjectReport();
                         case "8" -> assignProjectManager();
                         case "9" -> {
+                            currentEmployee.logOut();
                             System.out.println(
                                 "Thank you for using Project System Management"
                             );
