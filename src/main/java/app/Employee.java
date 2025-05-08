@@ -17,33 +17,30 @@ public class Employee {
     private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy-HH:mm");
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-
     private final List<TimeEntry> timeRegistry = new ArrayList<>();
 
     public List<TimeEntry> getTimeRegistry() {
         return timeRegistry;
     }
 
-
     public Employee(String id) {
         this.id = id;
         this.loggedIn = false;
     }
 
-
-    public void logIn(){
+    public void logIn() {
         this.loggedIn = true;
     }
 
-    public void logOut(){
+    public void logOut() {
         this.loggedIn = false;
     }
 
-    public boolean isLoggedIn(){
+    public boolean isLoggedIn() {
         return this.loggedIn;
     }
 
-    public String getId(){
+    public String getId() {
         return this.id;
     }
 
@@ -88,12 +85,7 @@ public class Employee {
             throw new IllegalArgumentException("Budgeted time must be a positive number. Project has not been created.");
         }
 
-        return system.createProject(
-            tempProjectName,
-            tempStartDate,
-            tempEndDate,
-            budgetedTime
-        );
+        return system.createProject(tempProjectName, tempStartDate, tempEndDate, budgetedTime);
     }
 
     public boolean canTakeMoreActivities() {
@@ -106,43 +98,48 @@ public class Employee {
 
     public String registerTime(String type, ArrayList<String> date, String projectName, String activityName, ProjectSystem system) {
         if (!loggedIn) {
-            throw new IllegalStateException("Bruger ikke logget ind");
+            throw new IllegalStateException("User not logged in");
         }
 
         TimeEntry.EntryType entryType;
         try {
             entryType = TimeEntry.EntryType.valueOf(type);
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Ugyldig tidstype");
+            throw new IllegalArgumentException("Invalid time type");
         }
 
         if (date == null || date.size() != 2) {
-            throw new IllegalArgumentException("Dato skal indeholde præcis to elementer");
+            throw new IllegalArgumentException("Date must contain exactly two elements");
         }
 
         if (entryType == TimeEntry.EntryType.Work) {
-            // Format: "YYYY-MM-DD-HH:mm"
             LocalDateTime start = parseDateTime(date.get(0));
             LocalDateTime end = parseDateTime(date.get(1));
 
+            // Første tjek: Samme dato?
             if (!start.toLocalDate().equals(end.toLocalDate())) {
-                throw new IllegalArgumentException("Arbejdstid skal være på samme dato");
+                throw new IllegalArgumentException("Work hours must be registered on the same date");
             }
 
             double duration = (double) java.time.Duration.between(start, end).toMinutes() / 60.0;
             if (duration <= 0 || duration > 24 || duration % 0.5 != 0) {
-                throw new IllegalArgumentException("Ugyldig arbejdstid");
+                throw new IllegalArgumentException("Invalid work duration");
             }
 
             Project project = system.getProjectByName(projectName);
-            if (project == null) throw new IllegalArgumentException("Projekt eller aktivitet ikke fundet");
-
-            Activity activity = project.getActivityByName(activityName);
-            if (activity == null || !activity.isEmployeeAssigned(this)) {
-                throw new IllegalArgumentException("Projekt eller aktivitet ikke fundet");
+            if (project == null) {
+                throw new IllegalArgumentException("Project or activity not found");
             }
 
-            // Før du tilføjer ny entry, fjern gammel både fra employee og activity
+            Activity activity = project.getActivityByName(activityName);
+            if (activity == null) {
+                throw new IllegalArgumentException("Project or activity not found");
+            }
+
+            if (!activity.isEmployeeAssigned(this)) {
+                throw new IllegalArgumentException("Employee is not assigned to the activity");
+            }
+
             timeRegistry.removeIf(e ->
                     e.getType() == TimeEntry.EntryType.Work &&
                             e.getStartDateTime().toLocalDate().equals(start.toLocalDate()) &&
@@ -159,17 +156,16 @@ public class Employee {
             TimeEntry newEntry = new TimeEntry(entryType, start, end, projectName, activityName);
             timeRegistry.add(newEntry);
             activity.addWorkEntry(newEntry);
-            return "Registrering gennemført";
+            return "Registration completed";
+
         } else {
-            // Format: "YYYY-MM-DD"
             LocalDate start = parseDate(date.get(0));
             LocalDate end = parseDate(date.get(1));
 
             if (start.isAfter(end)) {
-                throw new IllegalArgumentException("Startdato må ikke være efter slutdato");
+                throw new IllegalArgumentException("Start date cannot be after end date");
             }
 
-            // Tjek for overlap
             for (TimeEntry entry : timeRegistry) {
                 if (entry.getType() == entryType) {
                     if (!entry.getEndDate().isBefore(start) && !entry.getStartDate().isAfter(end)) {
@@ -180,9 +176,10 @@ public class Employee {
 
             TimeEntry newEntry = new TimeEntry(entryType, start, end);
             timeRegistry.add(newEntry);
-            return "Fravær registreret";
+            return "Absence registered";
         }
     }
+
 
 
     private LocalDateTime parseDateTime(String input) {
@@ -200,5 +197,4 @@ public class Employee {
             throw new IllegalArgumentException("Invalid date format (dd/MM/yyyy)");
         }
     }
-
 }
