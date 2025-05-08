@@ -59,26 +59,33 @@ public class GenerateProjectReportSteps {
     }
 
 
-    @And("{string} in {string} has a budgeted time of {int} hours")
-    public void activityHasBudgetedTime(String activityName, String projectName, int hours) {
+    @And("{string} in {string} has a budgeted time of {double} hours")
+    public void activityHasBudgetedTime(String activityName, String projectName, double hours) {
         Project project = projectSystem.getProjectByName(projectName);
         Activity activity = project.getActivityByName(activityName);
         activity.setBudgetedTime(hours);
     }
 
-    @And("{int} hours of work are registered on activity {string} in {string}")
-    public void registerHoursOfWork(int hours, String activityName, String projectName) {
+    @And("{double} hours of work are registered on activity {string} in {string}")
+    public void registerHoursOfWork(double hours, String activityName, String projectName) {
         Project project = projectSystem.getProjectByName(projectName);
         Activity activity = project.getActivityByName(activityName);
         LocalDate baseDate = LocalDate.of(2025, 5, 1);  // Start fra 1. maj 2025
 
-        IntStream.range(0, hours).forEach(i -> {
-            LocalDate day = baseDate.plusDays(i);  // Sikrer gyldig dato
+        double remainingHours = hours;
+        LocalDate day = baseDate;
+
+        while (remainingHours > 0) {
+            double duration = Math.min(1.0, remainingHours); // log max 1 hour per entry
             LocalDateTime start = day.atTime(9, 0);
-            LocalDateTime end = start.plusHours(1);
+            LocalDateTime end = start.plusMinutes((long)(duration * 60));
             TimeEntry entry = new TimeEntry(TimeEntry.EntryType.Work, start, end, projectName, activityName);
             activity.addWorkEntry(entry);
-        });
+
+            remainingHours -= duration;
+            day = day.plusDays(1); // move to next day
+        }
+
     }
 
 
@@ -98,7 +105,7 @@ public class GenerateProjectReportSteps {
         }
 
         boolean allZero = currentReport.getActivities().stream()
-                .mapToInt(Activity::getBudgetedTime)
+                .mapToDouble(Activity::getBudgetedTime)
                 .sum() == 0;
 
         if (allZero) {
@@ -107,43 +114,43 @@ public class GenerateProjectReportSteps {
     }
 
 
-    @Then("the system displays the total registered hours as {int}")
-    public void systemDisplaysTotalRegisteredHours(int expected) {
-        int actual = currentReport.getActivities().stream().mapToInt(Activity::getRegisteredTime).sum();
+    @Then("the system displays the total registered hours as {double}")
+    public void systemDisplaysTotalRegisteredHours(double expected) {
+        double actual = currentReport.getActivities().stream().mapToDouble(Activity::getRegisteredTime).sum();
         assertEquals(expected, actual);
     }
 
-    @And("the system displays the budgeted time as {int}")
-    public void systemDisplaysBudgetedTime(int expected) {
-        int actual = currentReport.getActivities().stream().mapToInt(Activity::getBudgetedTime).sum();
+    @And("the system displays the budgeted time as {double}")
+    public void systemDisplaysBudgetedTime(double expected) {
+        double actual = currentReport.getActivities().stream().mapToDouble(Activity::getBudgetedTime).sum();
         assertEquals(expected, actual);
     }
 
-    @And("the system displays the unallocated hours as {int}")
-    public void systemDisplaysUnallocatedHours(int expected) {
-        int budget = currentReport.getActivities().stream().mapToInt(Activity::getBudgetedTime).sum();
-        int registered = currentReport.getActivities().stream().mapToInt(Activity::getRegisteredTime).sum();
+    @And("the system displays the unallocated hours as {double}")
+    public void systemDisplaysUnallocatedHours(double expected) {
+        double budget = currentReport.getActivities().stream().mapToDouble(Activity::getBudgetedTime).sum();
+        double registered = currentReport.getActivities().stream().mapToDouble(Activity::getRegisteredTime).sum();
         assertEquals(expected, budget - registered);
     }
 
     @And("the system confirms that the project is within budget")
     public void systemConfirmsProjectWithinBudget() {
-        int budget = currentReport.getActivities().stream().mapToInt(Activity::getBudgetedTime).sum();
-        int registered = currentReport.getActivities().stream().mapToInt(Activity::getRegisteredTime).sum();
+        double budget = currentReport.getActivities().stream().mapToDouble(Activity::getBudgetedTime).sum();
+        double registered = currentReport.getActivities().stream().mapToDouble(Activity::getRegisteredTime).sum();
         assertTrue(registered <= budget);
     }
 
     @And("the system displays the estimated remaining work time")
     public void systemDisplaysRemainingTime() {
-        int budget = currentReport.getActivities().stream().mapToInt(Activity::getBudgetedTime).sum();
-        int registered = currentReport.getActivities().stream().mapToInt(Activity::getRegisteredTime).sum();
-        int remaining = budget - registered;
+        double budget = currentReport.getActivities().stream().mapToDouble(Activity::getBudgetedTime).sum();
+        double registered = currentReport.getActivities().stream().mapToDouble(Activity::getRegisteredTime).sum();
+        double remaining = budget - registered;
         assertTrue(remaining >= 0);
     }
 
     @And("the system warns {string}")
     public void systemWarns(String expectedWarning) {
-        int registered = currentReport.getActivities().stream().mapToInt(Activity::getRegisteredTime).sum();
+        double registered = currentReport.getActivities().stream().mapToDouble(Activity::getRegisteredTime).sum();
         if (registered == 0) {
             assertEquals(expectedWarning, "No work has been registered on this project yet");
         } else {

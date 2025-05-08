@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Scanner;
 
 public class Main {
-
     private static final Scanner scanner = new Scanner(System.in);
     private static final ProjectSystem projectSystem = new ProjectSystem();
     private static Employee currentEmployee = null;
@@ -16,6 +15,7 @@ public class Main {
         projectSystem.registerEmployee("teem");
         projectSystem.registerEmployee("huba");
         projectSystem.registerEmployee("pby");
+        projectSystem.registerEmployee("maes");
 
         // Pre-create a project named "p1"
         Project defaultProject = projectSystem.createProject(
@@ -94,6 +94,7 @@ public class Main {
                 }
             } catch (RuntimeException e) {
                 System.out.println("Returning to main menu...");
+                System.out.println("Reason: " + e.getMessage());
             }
         }
     }
@@ -119,27 +120,34 @@ public class Main {
                 "Please enter your project name (ex. Greg's Website)"
             );
             currentEmployee.inputProjectName(projectName);
+
             LocalDate startDate = LocalDate.parse(
-                prompt("Please enter start date (dd/MM/yyyy)"),
-                DateTimeFormatter.ofPattern("dd/MM/yyyy")
+                    prompt("Please enter start date (dd/MM/yyyy)"),
+                    DateTimeFormatter.ofPattern("dd/MM/yyyy")
             );
             currentEmployee.inputStartDate(startDate);
+
             LocalDate endDate = LocalDate.parse(
-                prompt("Please enter end date (dd/MM/yyyy)"),
-                DateTimeFormatter.ofPattern("dd/MM/yyyy")
+                    prompt("Please enter end date (dd/MM/yyyy)"),
+                    DateTimeFormatter.ofPattern("dd/MM/yyyy")
             );
             currentEmployee.inputEndDate(endDate);
-            double budgetedTime = Double.parseDouble(
-                prompt("Please enter budgeted time in hours (e.g. 120.5)")
-            );
-            currentEmployee.inputBudgetedTime(budgetedTime);
+
+            String budgetInput = prompt("Please enter budgeted time in hours (e.g. 120.5):");
+            if (budgetInput.isBlank()) {
+                currentEmployee.inputBudgetedTime(null); // This lets Employee handle null and throw the friendly message
+            } else {
+                try {
+                    Double budgetedTime = Double.parseDouble(budgetInput);
+                    currentEmployee.inputBudgetedTime(budgetedTime);
+                } catch (NumberFormatException e) {
+                    throw new IllegalArgumentException("Budgeted time must be a valid number.");
+                }
+            }
+
+
             var project = currentEmployee.createProject(projectSystem);
-            System.out.println(
-                "Project " +
-                project.getName() +
-                " created successfully with id " +
-                project.getId()
-            );
+            System.out.println("Project " + project.getName() + " created successfully with id " + project.getId());
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
         }
@@ -365,22 +373,28 @@ public class Main {
             return;
         }
 
+        if (project.getProjectManager() == null || !project.getProjectManager().getId().equals(currentEmployee.getId())) {
+            System.out.println("Error: Only the project manager can generate the project report.");
+            return;
+        }
+
+
         List<Activity> activities = project.getActivities();
 
-        int totalBudgetedTime = (int) project.getBudgetedTime();
-        int totalRegisteredTime = activities
+        double totalBudgetedTime = project.getBudgetedTime();
+        Double totalRegisteredTime = activities
             .stream()
-            .mapToInt(Activity::getRegisteredTime)
+            .mapToDouble(Activity::getRegisteredTime)
             .sum();
-        int unallocatedHours = totalBudgetedTime - totalRegisteredTime;
-        int estimatedRemaining = Math.max(unallocatedHours, 0);
+        double unallocatedHours = totalBudgetedTime - totalRegisteredTime;
+        double estimatedRemaining = Math.max(unallocatedHours, 0);
 
         System.out.println(
             "\n--- Project Report for '" + projectName + "' ---"
         );
         System.out.println("");
         System.out.println("Project ID: " + project.getId());
-        System.out.println("Project Manager: " + project.getProjectManager());
+        System.out.println("Project Manager: " + project.getProjectManager().getId());
         System.out.println("Start Date: " + project.getStartDate());
         System.out.println("End Date: " + project.getEndDate());
         System.out.println();
@@ -406,13 +420,11 @@ public class Main {
 
         System.out.println("Assigned Employees:");
         for (Employee employee : project.getEmployees()) {
-            System.out.println(
-                "- " +
-                employee.getId() +
-                " (" +
-                employee.getTimeRegistry().size() +
-                " time entries)"
-            );
+            long projectEntryCount = employee.getTimeRegistry().stream()
+                    .filter(entry -> entry.getType() == TimeEntry.EntryType.Work)
+                    .filter(entry -> projectName.equals(entry.getProjectName()))
+                    .count();
+            System.out.println("- " + employee.getId() + " (" + projectEntryCount + " time entries)");
         }
         System.out.println();
 
@@ -430,8 +442,9 @@ public class Main {
         for (Employee employee : project.getEmployees()) {
             System.out.println("  Employee: " + employee.getId());
             for (TimeEntry timeEntry : employee.getTimeRegistry()) {
-                System.out.println("    Type: " + timeEntry.getType());
-                if (timeEntry.getType() == TimeEntry.EntryType.Work) {
+                if (timeEntry.getType() == TimeEntry.EntryType.Work &&
+                        projectName.equals(timeEntry.getProjectName())) {
+                    System.out.println("    Type: " + timeEntry.getType());
                     System.out.println(
                         "    Project: " + timeEntry.getProjectName()
                     );
@@ -448,13 +461,6 @@ public class Main {
                         "    Duration: " +
                         timeEntry.getWorkDurationInHours() +
                         " hours"
-                    );
-                } else {
-                    System.out.println(
-                        "    Start: " +
-                        timeEntry.getStartDate() +
-                        " End: " +
-                        timeEntry.getEndDate()
                     );
                 }
             }

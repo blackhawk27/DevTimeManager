@@ -10,13 +10,13 @@ public class Project {
     private String id;
     private LocalDate startDate;
     private LocalDate endDate;
-    private double budgetedTime;
+    private Double budgetedTime;
     private List<Employee> employees = new ArrayList<>();
     private final List<Activity> activities = new ArrayList<>();
     private ProjectManager projectManager;
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-    public Project(String name, String id, LocalDate start, LocalDate end, double budgetedTime) {
+    public Project(String name, String id, LocalDate start, LocalDate end, Double budgetedTime) {
         this.name = name;
         this.id = id;
         this.startDate = start;
@@ -48,7 +48,7 @@ public class Project {
     }
 
 
-    public double getBudgetedTime() {
+    public Double getBudgetedTime() {
         return budgetedTime;
     }
 

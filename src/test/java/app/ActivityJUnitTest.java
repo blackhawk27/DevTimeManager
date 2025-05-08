@@ -63,7 +63,7 @@ class ActivityJUnitTest {
 
     @Test
     void testSetAndGetBudgetedTime() {
-        activity.setBudgetedTime(15);
+        activity.setBudgetedTime(15.0);
         assertEquals(15, activity.getBudgetedTime());
     }
 

@@ -15,7 +15,8 @@ public class CreateProjectSteps {
     private Employee employee;
     private Project createdProject;
     private String errorMessage;
-    private double budgetedTime;
+    private Double budgetedTime; // Use wrapper class to allow null
+
 
     @Given("an employee with id {string} logs in to create project")
     public void anEmployeeLogsInToCreateProject(String id) {
@@ -56,6 +57,13 @@ public class CreateProjectSteps {
     public void theEmployeeInputsBudgetedTime(double time) {
         employee.inputBudgetedTime(time);
     }
+
+    @When("the employee inputs no budgeted time")
+    public void theEmployeeInputsNoBudgetedTime() {
+        // Simulate missing input by not setting it at all
+        employee.inputBudgetedTime(null); // Update method to accept boxed Double if needed
+    }
+
 
     private void tryParseDate(String dateStr, boolean isStartDate) {
         try {
