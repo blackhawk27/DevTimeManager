@@ -67,7 +67,7 @@ public class Main {
         }
         currentEmployee = projectSystem.getEmployeeById(id);
         currentEmployee.logIn();
-        System.out.println("You're now logged in as employee: teem");
+        System.out.println("You're now logged in as employee: " + currentEmployee.getId());
     }
 
     private static void createProject() {
@@ -243,7 +243,7 @@ public class Main {
 
         List<Activity> activities = project.getActivities();
 
-        int totalBudgetedTime = (int) project.getBudgetedTime();;
+        int totalBudgetedTime = (int) project.getBudgetedTime();
         int totalRegisteredTime = activities.stream().mapToInt(Activity::getRegisteredTime).sum();
         int unallocatedHours = totalBudgetedTime - totalRegisteredTime;
         int estimatedRemaining = Math.max(unallocatedHours, 0);
