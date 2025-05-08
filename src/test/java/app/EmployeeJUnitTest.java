@@ -17,6 +17,7 @@ public class EmployeeJUnitTest {
     @BeforeEach
     void init() {
         projSys = new ProjectSystem();
+        proj = new Project("Project1", "25001", LocalDate.now(), LocalDate.now().plusDays(1), 120.5);
         projSys.registerEmployee("E1");
         emp = projSys.getEmployeeById("E1");
 
@@ -59,6 +60,7 @@ public class EmployeeJUnitTest {
         emp.inputProjectName("New Project");
         emp.inputStartDate(LocalDate.now());
         emp.inputEndDate(LocalDate.now().plusDays(1));
+        emp.inputBudgetedTime(10.5);
         emp.inputBudgetedTime(20.0);
 
         IllegalArgumentException ex = assertThrows(

@@ -21,8 +21,6 @@ public class Activity {
         this.endDate = endDate;
     }
 
-
-
     public String getId() {
         return id;
     }

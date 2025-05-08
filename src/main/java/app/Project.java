@@ -93,8 +93,8 @@ public class Project {
         if (!employees.stream().anyMatch(e -> e.getId().equals(newManager.getId()))) {
             throw new IllegalStateException(newManager.getId() + " is not registered as an employee.");
         }
-        // no manager yet → OK
-        setProjectManager(newManager);
+
+        this.projectManager = newManager;
         newManager.addProject(this);
     }
 

@@ -53,7 +53,6 @@ public class AddEmployeeSteps {
         }
     }
 
-    @And("{string} is already assigned to 10 activities")
     @And("{string} is already assigned to 10 other activities")
     public void employeeIsAssignedTo10Activities(String empId) {
         Employee emp = AddEmployeeSteps.projectSystem.getEmployeeById(empId);
