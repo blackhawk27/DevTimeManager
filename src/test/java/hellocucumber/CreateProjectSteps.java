@@ -40,7 +40,7 @@ public class CreateProjectSteps {
 
     @And("the employee inputs and empty name")
     public void theEmployeeInputsAndEmptyName() {
-        employee.inputProjectName("");
+        employee.inputProjectName(null);
     }
 
     @When("the employee inputs start date {string}")
