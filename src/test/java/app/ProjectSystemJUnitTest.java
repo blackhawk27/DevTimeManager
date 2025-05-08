@@ -1,6 +1,5 @@
-package hellocucumber;
+package app;
 
-import app.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
