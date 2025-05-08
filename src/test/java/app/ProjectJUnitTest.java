@@ -1,15 +1,10 @@
-package hellocucumber;
+package app;
 
-import app.Activity;
-import app.Employee;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.util.List;
-
-import app.Project;
-import app.ProjectManager;
 
 import static org.junit.jupiter.api.Assertions.*;
 
