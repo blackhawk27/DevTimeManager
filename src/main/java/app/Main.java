@@ -30,10 +30,14 @@ public class Main {
                 System.out.println("9 - Exit");
             }
             String option = scanner.nextLine();
-
-            try {
+            try{
+            if (currentEmployee == null || !currentEmployee.loggedIn) {
                 switch (option) {
                     case "1" -> logIn();
+                    default -> System.out.println("Invalid option");
+                }
+            } else {
+                    switch (option) {
                     case "2" -> createProject();
                     case "3" -> assignEmployeeToProject();
                     case "4" -> createActivity();
@@ -46,6 +50,7 @@ public class Main {
                         return;
                     }
                     default -> System.out.println("Invalid option");
+                    }
                 }
             } catch (RuntimeException e) {
                 System.out.println("Returning to main menu...");
@@ -224,7 +229,9 @@ public class Main {
 
 
     private static void generateProjectReport() {
-        // Not implemented yet
+        String activityName = prompt("Input activity name: ");
+
+
     }
 
     private static String prompt(String message) {
