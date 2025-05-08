@@ -97,9 +97,12 @@ public class Employee {
     }
 
     public String registerTime(String type, ArrayList<String> date, String projectName, String activityName, ProjectSystem system) {
-        if (!loggedIn) {
-            throw new IllegalStateException("User not logged in");
-        }
+        // Preconditions (general)
+        assert loggedIn : "Precondition failed: User must be logged in";
+        assert type != null : "Precondition failed: Type must not be null";
+        assert date != null : "Precondition failed: Date list must not be null";
+        assert date.size() == 2 : "Precondition failed: Date list must contain exactly two elements";
+        assert system != null : "Precondition failed: System must not be null";
 
         TimeEntry.EntryType entryType;
         try {
@@ -108,37 +111,26 @@ public class Employee {
             throw new IllegalArgumentException("Invalid time type");
         }
 
-        if (date == null || date.size() != 2) {
-            throw new IllegalArgumentException("Date must contain exactly two elements");
-        }
-
         if (entryType == TimeEntry.EntryType.Work) {
             LocalDateTime start = parseDateTime(date.get(0));
             LocalDateTime end = parseDateTime(date.get(1));
 
-            // Første tjek: Samme dato?
-            if (!start.toLocalDate().equals(end.toLocalDate())) {
-                throw new IllegalArgumentException("Work hours must be registered on the same date");
-            }
+            // Preconditions (Work type)
+            assert start.toLocalDate().equals(end.toLocalDate()) :
+                    "Precondition failed: Work entries must be on the same date";
 
             double duration = (double) java.time.Duration.between(start, end).toMinutes() / 60.0;
-            if (duration <= 0 || duration > 24 || duration % 0.5 != 0) {
-                throw new IllegalArgumentException("Invalid work duration");
-            }
+            assert duration > 0 && duration <= 24 && duration % 0.5 == 0 :
+                    "Precondition failed: Duration must be between 0 and 24 hours, in 0.5-hour increments";
 
             Project project = system.getProjectByName(projectName);
-            if (project == null) {
-                throw new IllegalArgumentException("Project or activity not found");
-            }
+            assert project != null : "Precondition failed: Project must exist";
 
             Activity activity = project.getActivityByName(activityName);
-            if (activity == null) {
-                throw new IllegalArgumentException("Project or activity not found");
-            }
+            assert activity != null : "Precondition failed: Activity must exist";
 
-            if (!activity.isEmployeeAssigned(this)) {
-                throw new IllegalArgumentException("Employee is not assigned to the activity");
-            }
+            assert activity.isEmployeeAssigned(this) :
+                    "Precondition failed: Employee must be assigned to the activity";
 
             timeRegistry.removeIf(e ->
                     e.getType() == TimeEntry.EntryType.Work &&
@@ -156,26 +148,57 @@ public class Employee {
             TimeEntry newEntry = new TimeEntry(entryType, start, end, projectName, activityName);
             timeRegistry.add(newEntry);
             activity.addWorkEntry(newEntry);
+
+            // Postconditions (Work type)
+            boolean existsInEmployee = timeRegistry.stream().anyMatch(e ->
+                    e.getType() == TimeEntry.EntryType.Work &&
+                            e.getStartDateTime().equals(start) &&
+                            e.getEndDateTime().equals(end) &&
+                            e.getProjectName().equals(projectName) &&
+                            e.getActivityName().equals(activityName)
+            );
+            assert existsInEmployee :
+                    "Postcondition failed: Time entry should exist in employee's registry";
+
+            boolean existsInActivity = activity.getWorkEntries().stream().anyMatch(e ->
+                    e.getStartDateTime().equals(start) &&
+                            e.getEndDateTime().equals(end) &&
+                            e.getProjectName().equals(projectName) &&
+                            e.getActivityName().equals(activityName)
+            );
+            assert existsInActivity :
+                    "Postcondition failed: Time entry should exist in activity's registry";
+
             return "Registration completed";
 
         } else {
             LocalDate start = parseDate(date.get(0));
             LocalDate end = parseDate(date.get(1));
 
-            if (start.isAfter(end)) {
-                throw new IllegalArgumentException("Start date cannot be after end date");
-            }
+            // Preconditions (non-Work type)
+            assert !start.isAfter(end) :
+                    "Precondition failed: Start date cannot be after end date";
 
-            for (TimeEntry entry : timeRegistry) {
-                if (entry.getType() == entryType) {
-                    if (!entry.getEndDate().isBefore(start) && !entry.getStartDate().isAfter(end)) {
-                        throw new IllegalArgumentException("Overlapping time registration");
-                    }
-                }
-            }
+            boolean noOverlap = timeRegistry.stream().noneMatch(entry ->
+                    entry.getType() == entryType &&
+                            !entry.getEndDate().isBefore(start) &&
+                            !entry.getStartDate().isAfter(end)
+            );
+            assert noOverlap :
+                    "Precondition failed: No overlapping time registrations allowed";
 
             TimeEntry newEntry = new TimeEntry(entryType, start, end);
             timeRegistry.add(newEntry);
+
+            // Postconditions (non-Work type)
+            boolean exists = timeRegistry.stream().anyMatch(e ->
+                    e.getType() == entryType &&
+                            e.getStartDate().equals(start) &&
+                            e.getEndDate().equals(end)
+            );
+            assert exists :
+                    "Postcondition failed: Absence entry should exist in employee's registry";
+
             return "Absence registered";
         }
     }
