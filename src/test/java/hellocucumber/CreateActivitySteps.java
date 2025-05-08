@@ -42,23 +42,31 @@ public class CreateActivitySteps {
 
     @When("a new activity with name {string}, start date {string} and end date {string} is added to the project {string}")
     public void addActivityWithoutId(String name, String start, String end, String projectName) {
+        // parse dates
+        LocalDate startDate = parse(start);
+        LocalDate endDate   = parse(end);
+
+        // date‐ordering guard
+        if (startDate.isAfter(endDate)) {
+            errorMessage = "End date cannot be before start date";
+            return;
+        }
+
+        // build activity
+        Activity activity = new Activity(
+                projectSystem.generateActivityID(),
+                name,
+                startDate,
+                endDate
+        );
+
         try {
-            LocalDate startDate = parse(start);
-            LocalDate endDate = parse(end);
-            if (startDate.isAfter(endDate)) {
-                errorMessage = "End date cannot be before start date";
-                return;
-            }
-            Project project = projectSystem.getProjectByName(projectName);
-            if (project.getActivityByName(name) != null) {
-                errorMessage = "Activity with name '" + name + "' already exists in project '" + projectName + "'";
-                return;
-            }
-            String id = projectSystem.generateActivityID(); // automatisk ID
-            Activity activity = new Activity(id, name, startDate, endDate);
-            project.addActivity(activity);
-        } catch (Exception e) {
-            errorMessage = e.getMessage();
+            // this will throw if a duplicate name exists
+            projectSystem
+                    .getProjectByName(projectName)
+                    .addActivity(activity);
+        } catch (IllegalArgumentException ex) {
+            errorMessage = ex.getMessage();
         }
     }
 
@@ -85,7 +93,27 @@ public class CreateActivitySteps {
 
     @When("the project manager tries to add another activity with name {string}, start date {string} and end date {string} to project {string}")
     public void tryAddingDuplicateActivityWithoutId(String name, String start, String end, String projectName) {
-        addActivityWithoutId(name, start, end, projectName);
+        // parse dates
+        LocalDate startDate = parse(start);
+        LocalDate endDate   = parse(end);
+
+        // build a new Activity
+        Activity duplicate = new Activity(
+                projectSystem.generateActivityID(),
+                name,
+                startDate,
+                endDate
+        );
+
+        try {
+            // attempt to add it to the project
+            projectSystem
+                    .getProjectByName(projectName)
+                    .addActivity(duplicate);
+        } catch (IllegalArgumentException e) {
+            // capture the exact “duplicate name” message
+            errorMessage = e.getMessage();
+        }
     }
 
 
