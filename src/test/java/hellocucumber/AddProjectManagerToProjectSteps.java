@@ -90,20 +90,19 @@ public class AddProjectManagerToProjectSteps {
 
     @When("{string} tries to assign {string} as the project manager of {string}")
     public void triesToAssignAsProjectManagerOf(String assigningEmployeeId, String newManagerId, String projectName) {
-        // Set up the assigning employee and the new project manager
-        Employee assigningEmployee = new Employee(assigningEmployeeId);
-        ProjectManager newManager = new ProjectManager(newManagerId);
-
-        // Ensure the assigning employee is part of the project
-        if (!project.getEmployees().contains(assigningEmployee)) {
-            project.addEmployee(assigningEmployee);
+        Employee assigningEmployee = employees.get(assigningEmployeeId);
+        if (assigningEmployee == null) {
+            assigningEmployee = new Employee(assigningEmployeeId);
+            employees.put(assigningEmployeeId, assigningEmployee);
         }
 
+        ProjectManager newManager = new ProjectManager(newManagerId);
+
         try {
-            // Try assigning project manager
+            // Do NOT auto-add the assigning employee to the project here!
             project.assignProjectManager(assigningEmployee, newManager);
         } catch (IllegalStateException e) {
-            errorMessage = e.getMessage();  // Catch the error message
+            errorMessage = e.getMessage();
         }
     }
 
