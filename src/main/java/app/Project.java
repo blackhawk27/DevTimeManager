@@ -207,10 +207,12 @@ public class Project {
         return projectManager;
     }
 
-    public void assignProjectManager(
-        Employee assigningEmployee,
-        ProjectManager newManager
-    ) {
+    public void assignProjectManager(Employee assigningEmployee, ProjectManager newManager) {
+        // Preconditions
+        assert assigningEmployee != null : "Assigning employee cannot be null";
+        assert newManager != null : "New manager cannot be null";
+        assert employees.contains(assigningEmployee) : "Assigning employee must be part of the project";
+
         if (this.projectManager != null) {
             throw new IllegalStateException(
                 "This project already has a project manager. You cannot assign a new one."
@@ -235,5 +237,9 @@ public class Project {
 
         this.projectManager = newManager;
         newManager.addProject(this);
+
+        // Postconditions
+        assert this.projectManager.equals(newManager) : "Project manager was not assigned successfully";
+        assert this.projectManager != null : "Manager is null after assignment";
     }
 }
