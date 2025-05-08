@@ -230,6 +230,17 @@ public class Main {
             String activityName = prompt("Activity name");
             dateInputs.add(prompt("Start time (dd/MM/yyyy-HH:mm)"));
             dateInputs.add(prompt("End time (dd/MM/yyyy-HH:mm)"));
+            //-----------------------------------------------------------
+            Project project = projectSystem.getProjectByName(projectName);
+            if (project == null) {
+                System.out.println("Project not found.");
+                return;
+            }
+            if (!project.getEmployees().contains(currentEmployee)) {
+                System.out.println("Error: " + currentEmployee.getId() + " is not registered as an employee.");
+                return;
+            }
+            //-----------------------------------------------------------
             try {
                 currentEmployee.registerTime(
                     "Work",
