@@ -113,4 +113,6 @@ class ActivityJUnitTest {
         activity.addWorkEntry(workEntry2);
         assertEquals(2, activity.getWorkEntries().size());
     }
+
+
 }

@@ -89,32 +89,17 @@ public class ProjectSystem {
     /**
      * Adds an employee to a project and an activity.
      */
-    public void addEmployee(
-        String employeeId,
-        String projectName,
-        String activityName
-    ) {
-        // Først sikre at medarbejderen er på projektet – uden duplikat
-        addEmployee(employeeId, projectName);
-
+    public void addEmployee(String employeeId, String projectName, String activityName) {
+        Employee employee = getEmployeeById(employeeId);
         Project project = getProjectByName(projectName);
         Activity activity = project.getActivityByName(activityName);
         if (activity == null) {
-            throw new IllegalArgumentException(
-                "Activity " +
-                activityName +
-                " not found in project " +
-                projectName
-            );
+            throw new IllegalArgumentException("Activity " + activityName + " not found in project " + projectName);
         }
 
-        Employee employee = getEmployeeById(employeeId);
-
-        // Undgå at tilføje medarbejderen flere gange til samme aktivitet
-        if (!activity.isEmployeeAssigned(employee)) {
-            activity.assignEmployee(employee); // Aktiviteten håndterer sine egne regler (fx max 10 aktiviteter)
-        }
+        activity.assignEmployee(employee);
     }
+
 
     public boolean isRegistered(String id) {
         return employees.containsKey(id);

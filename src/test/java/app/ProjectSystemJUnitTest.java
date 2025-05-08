@@ -100,4 +100,27 @@ class ProjectSystemJUnitTest {
         assertNull(system.getProjectByName("New Website"),
                 "Project should have been removed by removeProjectByName");
     }
+
+    @Test
+    void assigningSameEmployeeTwiceToActivityThrowsException() {
+        system.addEmployee("huba", "New Website");
+
+        String aid = system.generateActivityID();
+        Activity activity = new Activity(aid, "Design", LocalDate.now(), LocalDate.now().plusDays(5));
+        project.addActivity(activity);
+
+        // First assignment should succeed
+        system.addEmployee("huba", "New Website", "Design");
+        assertTrue(activity.isEmployeeAssigned(emp), "Employee should be assigned after first add");
+
+        // Second assignment should throw
+        IllegalArgumentException ex = assertThrows(
+                IllegalArgumentException.class,
+                () -> system.addEmployee("huba", "New Website", "Design")
+        );
+        assertEquals("huba is already assigned to Design", ex.getMessage());
+    }
+
+
+
 }
