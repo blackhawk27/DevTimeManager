@@ -5,21 +5,17 @@ import io.cucumber.java.en.*;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.Map;
 import static hellocucumber.SharedContext.projectSystem;
 
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class AddEmployeeSteps {
-    //public static final ProjectSystem projectSystem = new ProjectSystem();
     private Project project;
     private Activity activity;
     private Employee employee;
     private String errorMessage;
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-    public static final Map<String, Project> sharedProjects = new HashMap<>();
 
 
     @Given("a project {string} exists")

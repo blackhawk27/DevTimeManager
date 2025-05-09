@@ -6,12 +6,10 @@ import io.cucumber.java.en.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.stream.IntStream;
 import static hellocucumber.SharedContext.projectSystem;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class GenerateProjectReportSteps {
-    //private final ProjectSystem projectSystem = AddEmployeeSteps.projectSystem;
     private Project currentReport;
     private String errorMessage;
 
@@ -152,7 +150,7 @@ public class GenerateProjectReportSteps {
     public void systemWarns(String expectedWarning) {
         double registered = currentReport.getActivities().stream().mapToDouble(Activity::getRegisteredTime).sum();
         if (registered == 0) {
-            assertEquals(expectedWarning, "No work has been registered on this project yet");
+            assertEquals("No work has been registered on this project yet", expectedWarning);
         } else {
             fail("Work was registered, but warning was expected");
         }

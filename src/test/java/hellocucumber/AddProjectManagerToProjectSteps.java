@@ -3,12 +3,10 @@ package hellocucumber;
 import app.Employee;
 import app.Project;
 import app.ProjectManager;
-import app.ProjectSystem;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import static hellocucumber.SharedContext.projectSystem;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,7 +19,6 @@ public class AddProjectManagerToProjectSteps {
     private ProjectManager projectManager;
     private String errorMessage;
     private Map<String, Employee> employees = new HashMap<>();
-    //private ProjectSystem projectSystem = new ProjectSystem();
 
     @Given("a project {string} exists with no manager")
     public void aProjectExists(String projectName) {
@@ -33,8 +30,6 @@ public class AddProjectManagerToProjectSteps {
 
     @And("an employee with id {string} is assigned to {string}")
     public void anEmployeeWithIdIsAssignedTo(String employeeId, String projectName) {
-        //employee = new Employee(employeeId);
-        //project.addEmployee(employee);
         Employee employee = new Employee(employeeId);
         employees.put(employeeId, employee);
         project.addEmployee(employee);

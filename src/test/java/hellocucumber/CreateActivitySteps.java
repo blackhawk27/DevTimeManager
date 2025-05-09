@@ -12,7 +12,6 @@ public class CreateActivitySteps {
 
     // private final ProjectSystem projectSystem = AddEmployeeSteps.projectSystem;
     private Project currentProject;
-    private Activity currentActivity;
     private Employee currentEmployee;
     private String errorMessage;
 

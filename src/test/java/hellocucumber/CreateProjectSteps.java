@@ -14,22 +14,16 @@ public class CreateProjectSteps {
     private Employee employee;
     private Project createdProject;
     private String errorMessage;
-    private Double budgetedTime; // Use wrapper class to allow null
     private String projectName;
 
 
     @Before(order=0)
     public void resetSystem() {
-        //projectSystem.getAllProjects().forEach(
-        //        p -> projectSystem.removeProjectByName(p.getName())
-        //);
-        //projectSystem.resetForTest();
         SharedContext.projectSystem = new ProjectSystem();
     }
 
     @Given("an employee with id {string} logs in to create project")
     public void anEmployeeLogsInToCreateProject(String id) {
-        //projectSystem = new ProjectSystem(); // Always start fresh for each scenario!
         employee = new Employee(id);
         employee.logIn();
         assertTrue(employee.isLoggedIn());
@@ -37,7 +31,6 @@ public class CreateProjectSteps {
 
     @Given("an employee with id {string} is not logged in")
     public void anEmployeeWithIdIsNotLoggedIn(String id) {
-        //projectSystem = new ProjectSystem();
         employee = new Employee(id);
         assertFalse(employee.isLoggedIn());
     }
@@ -70,8 +63,7 @@ public class CreateProjectSteps {
 
     @When("the employee inputs no budgeted time")
     public void theEmployeeInputsNoBudgetedTime() {
-        // Simulate missing input by not setting it at all
-        employee.inputBudgetedTime(null); // Update method to accept boxed Double if needed
+        employee.inputBudgetedTime(null);
     }
 
 

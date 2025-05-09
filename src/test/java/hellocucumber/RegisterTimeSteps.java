@@ -4,7 +4,6 @@ import app.*;
 import io.cucumber.java.en.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,11 +14,9 @@ import static org.junit.jupiter.api.Assertions.*;
 public class RegisterTimeSteps {
 
     private Employee employee;
-    //private ProjectSystem projectSystem;
     private Project project;
     private Activity activity;
     private String errorMessage;
-    private int calculatedWorkHours;
 
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
@@ -51,7 +48,6 @@ public class RegisterTimeSteps {
     public void anEmployeeWithIdIsLoggedIn(String id) {
         employee = new Employee(id);
         employee.logIn();
-        // Only register with projectSystem if we're in a project context
         projectSystem.registerEmployee(id);
         if (project != null) {
             project.addEmployee(employee);
