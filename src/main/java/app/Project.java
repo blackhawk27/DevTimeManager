@@ -60,9 +60,7 @@ public class Project {
 
         public String generateReport() {
 
-            // Preconditions
             assert this.name != null && !this.name.trim().isEmpty() : "Project name cannot be null or empty";
-
 
             StringBuilder report = new StringBuilder();
 

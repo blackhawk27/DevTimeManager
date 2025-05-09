@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -14,10 +15,10 @@ class ProjectSystemJUnitTest {
 
     @BeforeEach
     void setUp() {
-        system  = new ProjectSystem();
+        system = new ProjectSystem();
         system.registerEmployee("huba");
-        emp      = system.getEmployeeById("huba");
-        project  = system.createProject("New Website", LocalDate.now(), LocalDate.now().plusDays(10), 120);
+        emp = system.getEmployeeById("huba");
+        project = system.createProject("New Website", LocalDate.now(), LocalDate.now().plusDays(10), 120);
     }
 
     @Test
@@ -122,6 +123,70 @@ class ProjectSystemJUnitTest {
         assertEquals("huba is already assigned to Design", ex.getMessage());
     }
 
+    @Test
+    public void testGetAllProjectsReturnsCorrectList() {
+        system.resetForTest(); // Clean slate
+        system.createProject("Alpha", LocalDate.now(), LocalDate.now().plusDays(10), 100);
+        system.createProject("Beta", LocalDate.now(), LocalDate.now().plusDays(15), 150);
 
+        List<Project> allProjects = system.getAllProjects();
+
+        assertEquals(2, allProjects.size(), "Should return exactly 2 projects");
+        assertTrue(allProjects.stream().anyMatch(p -> p.getName().equals("Alpha")));
+        assertTrue(allProjects.stream().anyMatch(p -> p.getName().equals("Beta")));
+    }
+
+    @Test
+    public void testResetForTestClearsStateAndResetsCounters() {
+        system.createProject("TestProject", LocalDate.now(), LocalDate.now().plusDays(5), 100);
+        system.registerEmployee("E001");
+        system.generateActivityID();
+
+        system.resetForTest();
+
+        assertEquals(0, system.getAllProjects().size(), "Projects should be cleared");
+        assertNull(system.getEmployeeById("E001"), "Employees should be cleared");
+
+        String newProjectId = system.generateProjectID();
+        String newActivityId = system.generateActivityID();
+
+        assertEquals("25001", newProjectId, "Project counter should reset to 1");
+        assertEquals("A001", newActivityId, "Activity counter should reset to 1");
+    }
+
+    @Test
+    void createProjectshouldFailOnInvalidPreconditions() {
+        ProjectSystem ps = new ProjectSystem();
+        LocalDate validStart = LocalDate.now();
+        LocalDate validEnd = validStart.plusDays(5);
+
+        assertThrows(AssertionError.class, () ->
+                ps.createProject(null, validStart, validEnd, 10.0)
+        );
+
+        assertThrows(AssertionError.class, () ->
+                ps.createProject("  ", validStart, validEnd, 10.0)
+        );
+
+        assertThrows(AssertionError.class, () ->
+                ps.createProject("Test", null, validEnd, 10.0)
+        );
+
+        assertThrows(AssertionError.class, () ->
+                ps.createProject("Test", validStart, null, 10.0)
+        );
+
+        assertThrows(AssertionError.class, () ->
+                ps.createProject("Test", validStart.plusDays(5), validStart, 10.0)
+        );
+
+        assertThrows(AssertionError.class, () ->
+                ps.createProject("Test", validStart, validEnd, 0.0)
+        );
+
+        assertThrows(AssertionError.class, () ->
+                ps.createProject("Test", validStart, validEnd, -1.0)
+        );
+    }
 
 }
