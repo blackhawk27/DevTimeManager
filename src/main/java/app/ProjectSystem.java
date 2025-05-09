@@ -136,4 +136,17 @@ public class ProjectSystem {
         projects.removeIf(project -> project.getName().equals(projectName));
     }
 
+
+
+    public void resetForTest() {
+        projects.clear();
+        employees.clear();
+        projectCounter = 1;
+        activityCounter = 1;
+    }
+
+    public List<Project> getAllProjects() {
+        return new ArrayList<>(projects);
+    }
+
 }
