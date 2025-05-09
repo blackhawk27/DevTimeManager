@@ -1,7 +1,6 @@
 package app;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,9 +14,6 @@ public class Project {
     private List<Employee> employees = new ArrayList<>();
     private final List<Activity> activities = new ArrayList<>();
     private ProjectManager projectManager;
-    private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(
-        "dd/MM/yyyy"
-    );
 
     public Project(
         String name,
