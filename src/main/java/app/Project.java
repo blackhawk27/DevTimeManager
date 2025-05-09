@@ -62,127 +62,127 @@ public class Project {
         activities.add(activity);
     }
 
-    public String generateReport() {
+        public String generateReport() {
 
-        // Preconditions
-        assert this.name != null && !this.name.trim().isEmpty() : "Project name cannot be null or empty";
+            // Preconditions
+            assert this.name != null && !this.name.trim().isEmpty() : "Project name cannot be null or empty";
 
 
-        StringBuilder report = new StringBuilder();
+            StringBuilder report = new StringBuilder();
 
-        double totalBudgetedTime = (double) this.getBudgetedTime();
-        double totalRegisteredTime =
-            this.getActivities()
-                .stream()
-                .mapToDouble(Activity::getRegisteredTime)
-                .sum();
-        double unallocatedHours = totalBudgetedTime - totalRegisteredTime;
-        double estimatedRemaining = Math.max(unallocatedHours, 0);
+            double totalBudgetedTime = (double) this.getBudgetedTime();
+            double totalRegisteredTime =
+                this.getActivities()
+                    .stream()
+                    .mapToDouble(Activity::getRegisteredTime)
+                    .sum();
+            double unallocatedHours = totalBudgetedTime - totalRegisteredTime;
+            double estimatedRemaining = Math.max(unallocatedHours, 0);
 
-        report
-            .append("\n--- Project Report for '")
-            .append(this.getName())
-            .append("' ---\n\n");
-        report.append("Project ID: ").append(this.getId()).append("\n");
-        report
-            .append("Project Manager: ")
-            .append(this.getProjectManager().getId())
-            .append("\n");
-        report.append("Start Date: ").append(this.getStartDate()).append("\n");
-        report.append("End Date: ").append(this.getEndDate()).append("\n\n");
-        report
-            .append("Total Registered Hours: ")
-            .append(totalRegisteredTime)
-            .append("\n");
-        report.append("Budgeted Time: ").append(totalBudgetedTime).append("\n");
-        report
-            .append("Unallocated Hours: ")
-            .append(unallocatedHours)
-            .append("\n");
-        report
-            .append("Estimated Remaining Work Time: ")
-            .append(estimatedRemaining)
-            .append("\n\n");
-
-        if (totalRegisteredTime == 0) {
-            report.append(
-                "Warning: No work has been registered on this project yet.\n"
-            );
-        }
-
-        if (totalRegisteredTime > totalBudgetedTime) {
-            report.append("Project is over budget!\n");
-        } else {
-            report.append("Project is within budget.\n\n");
-        }
-
-        report.append("Assigned Employees:\n");
-        for (Employee employee : this.getEmployees()) {
             report
-                .append("- ")
-                .append(employee.getId())
-                .append(" (")
-                .append(employee.getTimeRegistry().size())
-                .append(" time entries)\n");
-        }
-        report.append("\n");
+                .append("\n--- Project Report for '")
+                .append(this.getName())
+                .append("' ---\n\n");
+            report.append("Project ID: ").append(this.getId()).append("\n");
+            report
+                .append("Project Manager: ")
+                .append(this.getProjectManager().getId())
+                .append("\n");
+            report.append("Start Date: ").append(this.getStartDate()).append("\n");
+            report.append("End Date: ").append(this.getEndDate()).append("\n\n");
+            report
+                .append("Total Registered Hours: ")
+                .append(totalRegisteredTime)
+                .append("\n");
+            report.append("Budgeted Time: ").append(totalBudgetedTime).append("\n");
+            report
+                .append("Unallocated Hours: ")
+                .append(unallocatedHours)
+                .append("\n");
+            report
+                .append("Estimated Remaining Work Time: ")
+                .append(estimatedRemaining)
+                .append("\n\n");
 
-        report.append("Activities:\n");
-        if (this.getActivities().isEmpty()) {
-            report.append("No activities assigned yet.\n");
-        } else {
-            for (Activity activity : this.getActivities()) {
-                report.append("- ").append(activity.getName()).append("\n");
+            if (totalRegisteredTime == 0) {
+                report.append(
+                    "Warning: No work has been registered on this project yet.\n"
+                );
             }
-        }
-        report.append("\n");
 
-        report.append("Time Entries:\n");
-        for (Employee employee : this.getEmployees()) {
-            report.append("  Employee: ").append(employee.getId()).append("\n");
-            for (TimeEntry timeEntry : employee.getTimeRegistry()) {
+            if (totalRegisteredTime > totalBudgetedTime) {
+                report.append("Project is over budget!\n");
+            } else {
+                report.append("Project is within budget.\n\n");
+            }
+
+            report.append("Assigned Employees:\n");
+            for (Employee employee : this.getEmployees()) {
                 report
-                    .append("    Type: ")
-                    .append(timeEntry.getType())
-                    .append("\n");
-                if (timeEntry.getType() == TimeEntry.EntryType.Work) {
-                    report
-                        .append("    Project: ")
-                        .append(timeEntry.getProjectName())
-                        .append("\n");
-                    report
-                        .append("    Activity: ")
-                        .append(timeEntry.getActivityName())
-                        .append("\n");
-                    report
-                        .append("    Start: ")
-                        .append(timeEntry.getStartDateTime())
-                        .append(" End: ")
-                        .append(timeEntry.getEndDateTime())
-                        .append("\n");
-                    report
-                        .append("    Duration: ")
-                        .append(timeEntry.getWorkDurationInHours())
-                        .append(" hours\n");
-                } else {
-                    report
-                        .append("    Start: ")
-                        .append(timeEntry.getStartDate())
-                        .append(" End: ")
-                        .append(timeEntry.getEndDate())
-                        .append("\n");
+                    .append("- ")
+                    .append(employee.getId())
+                    .append(" (")
+                    .append(employee.getTimeRegistry().size())
+                    .append(" time entries)\n");
+            }
+            report.append("\n");
+
+            report.append("Activities:\n");
+            if (this.getActivities().isEmpty()) {
+                report.append("No activities assigned yet.\n");
+            } else {
+                for (Activity activity : this.getActivities()) {
+                    report.append("- ").append(activity.getName()).append("\n");
                 }
             }
+            report.append("\n");
+
+            report.append("Time Entries:\n");
+            for (Employee employee : this.getEmployees()) {
+                report.append("  Employee: ").append(employee.getId()).append("\n");
+                for (TimeEntry timeEntry : employee.getTimeRegistry()) {
+                    report
+                        .append("    Type: ")
+                        .append(timeEntry.getType())
+                        .append("\n");
+                    if (timeEntry.getType() == TimeEntry.EntryType.Work) {
+                        report
+                            .append("    Project: ")
+                            .append(timeEntry.getProjectName())
+                            .append("\n");
+                        report
+                            .append("    Activity: ")
+                            .append(timeEntry.getActivityName())
+                            .append("\n");
+                        report
+                            .append("    Start: ")
+                            .append(timeEntry.getStartDateTime())
+                            .append(" End: ")
+                            .append(timeEntry.getEndDateTime())
+                            .append("\n");
+                        report
+                            .append("    Duration: ")
+                            .append(timeEntry.getWorkDurationInHours())
+                            .append(" hours\n");
+                    } else {
+                        report
+                            .append("    Start: ")
+                            .append(timeEntry.getStartDate())
+                            .append(" End: ")
+                            .append(timeEntry.getEndDate())
+                            .append("\n");
+                    }
+                }
+            }
+            report.append("\n");
+
+            // Postconditions
+            assert !report.isEmpty() : "Generated report is empty";
+            assert report.toString().contains("Project ID:") : "Report does not contain project ID";
+
+
+            return report.toString();
         }
-        report.append("\n");
-
-        // Postconditions
-        assert !report.isEmpty() : "Generated report is empty";
-        assert report.toString().contains("Project ID:") : "Report does not contain project ID";
-
-
-        return report.toString();
-    }
 
     public Double getBudgetedTime() {
         return budgetedTime;
@@ -221,7 +221,7 @@ public class Project {
         // Preconditions
         assert assigningEmployee != null : "Assigning employee cannot be null";
         assert newManager != null : "New manager cannot be null";
-        assert employees.contains(assigningEmployee) : "Assigning employee must be part of the project";
+        assert employees.contains(assigningEmployee) : assigningEmployee.getId() + " is not assigned to the project and cannot assign a manager.";
 
         if (this.projectManager != null) {
             throw new IllegalStateException(

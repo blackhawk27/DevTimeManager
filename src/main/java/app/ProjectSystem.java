@@ -15,7 +15,17 @@ public class ProjectSystem {
     private Map<String, Employee> employees = new HashMap<>();
 
     public ProjectSystem() {
-        // initialiser dine lister over projekter, medarbejdere osv.
+    }
+
+    public List<Project> getAllProjects() {
+        return new ArrayList<>(projects);
+    }
+
+    public void resetForTest() {
+        projects.clear();
+        employees.clear();
+        projectCounter = 1;
+        activityCounter = 1;
     }
 
     public Project createProject(
@@ -31,7 +41,7 @@ public class ProjectSystem {
         assert end != null : "End date cannot be null";
         assert !start.isAfter(end) : "Start date must be before or equal to end date";
         assert budgetedTime > 0 : "Budgeted time must be a positive number";
-        assert getProjectByName(name) == null : "Project with the same name already exists";
+        //assert getProjectByName(name) == null : "Project with the same name already exists";
 
         if (getProjectByName(name) != null) {
             throw new IllegalArgumentException(

@@ -7,11 +7,13 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
+import static hellocucumber.SharedContext.projectSystem;
+
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class AddEmployeeSteps {
-    public static final ProjectSystem projectSystem = new ProjectSystem();
+    //public static final ProjectSystem projectSystem = new ProjectSystem();
     private Project project;
     private Activity activity;
     private Employee employee;
@@ -55,11 +57,11 @@ public class AddEmployeeSteps {
 
     @And("{string} is already assigned to 10 other activities")
     public void employeeIsAssignedTo10Activities(String empId) {
-        Employee emp = AddEmployeeSteps.projectSystem.getEmployeeById(empId);
+        Employee emp = projectSystem.getEmployeeById(empId);
         if (emp == null) {
             emp = new Employee(empId);
             emp.logIn();
-            AddEmployeeSteps.projectSystem.registerEmployee(empId);
+            projectSystem.registerEmployee(empId);
         }
         for (int i = 0; i < 10; i++) {
             Activity dummy = new Activity("D" + i, "Dummy" + i, LocalDate.now(), LocalDate.now().plusDays(5));

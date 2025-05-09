@@ -1,26 +1,35 @@
 package hellocucumber;
 
 import app.ProjectSystem;
+import io.cucumber.java.Before;
 import io.cucumber.java.en.*;
 import app.Employee;
 import app.Project;
-
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class CreateProjectSteps {
-    public static app.ProjectSystem projectSystem = new app.ProjectSystem();
     private Employee employee;
     private Project createdProject;
     private String errorMessage;
     private Double budgetedTime; // Use wrapper class to allow null
+    private String projectName;
 
+
+    @Before(order=0)
+    public void resetSystem() {
+        //projectSystem.getAllProjects().forEach(
+        //        p -> projectSystem.removeProjectByName(p.getName())
+        //);
+        //projectSystem.resetForTest();
+        SharedContext.projectSystem = new ProjectSystem();
+    }
 
     @Given("an employee with id {string} logs in to create project")
     public void anEmployeeLogsInToCreateProject(String id) {
-        projectSystem = new ProjectSystem(); // Always start fresh for each scenario!
+        //projectSystem = new ProjectSystem(); // Always start fresh for each scenario!
         employee = new Employee(id);
         employee.logIn();
         assertTrue(employee.isLoggedIn());
@@ -28,13 +37,14 @@ public class CreateProjectSteps {
 
     @Given("an employee with id {string} is not logged in")
     public void anEmployeeWithIdIsNotLoggedIn(String id) {
-        projectSystem = new ProjectSystem();
+        //projectSystem = new ProjectSystem();
         employee = new Employee(id);
         assertFalse(employee.isLoggedIn());
     }
 
     @When("the employee inputs name {string}")
     public void theEmployeeInputsName(String name) {
+        projectName = name;
         employee.inputProjectName(name);
     }
 
@@ -133,12 +143,13 @@ public class CreateProjectSteps {
     @And("the employee creates the project")
     public void theEmployeeCreatesTheProject() {
         try {
-            createdProject = employee.createProject(projectSystem);
+            createdProject = employee.createProject(SharedContext.projectSystem);
             errorMessage = null;
         } catch (IllegalArgumentException e) {
             errorMessage = e.getMessage();
             createdProject = null;
         }
+
     }
 
     @Then("the system creates the project {string}")

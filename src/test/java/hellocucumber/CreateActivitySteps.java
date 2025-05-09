@@ -5,12 +5,12 @@ import io.cucumber.java.en.*;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-
+import static hellocucumber.SharedContext.projectSystem;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class CreateActivitySteps {
 
-    private final ProjectSystem projectSystem = AddEmployeeSteps.projectSystem;
+    // private final ProjectSystem projectSystem = AddEmployeeSteps.projectSystem;
     private Project currentProject;
     private Activity currentActivity;
     private Employee currentEmployee;
@@ -42,17 +42,14 @@ public class CreateActivitySteps {
 
     @When("a new activity with name {string}, start date {string} and end date {string} is added to the project {string}")
     public void addActivityWithoutId(String name, String start, String end, String projectName) {
-        // parse dates
         LocalDate startDate = parse(start);
-        LocalDate endDate   = parse(end);
+        LocalDate endDate = parse(end);
 
-        // date‐ordering guard
         if (startDate.isAfter(endDate)) {
             errorMessage = "End date cannot be before start date";
             return;
         }
 
-        // build activity
         Activity activity = new Activity(
                 projectSystem.generateActivityID(),
                 name,
@@ -61,10 +58,7 @@ public class CreateActivitySteps {
         );
 
         try {
-            // this will throw if a duplicate name exists
-            projectSystem
-                    .getProjectByName(projectName)
-                    .addActivity(activity);
+            projectSystem.getProjectByName(projectName).addActivity(activity);
         } catch (IllegalArgumentException ex) {
             errorMessage = ex.getMessage();
         }

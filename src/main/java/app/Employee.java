@@ -124,13 +124,15 @@ public class Employee {
                     "Precondition failed: Duration must be between 0 and 24 hours, in 0.5-hour increments";
 
             Project project = system.getProjectByName(projectName);
+            
             assert project != null : "Precondition failed: Project must exist";
 
             Activity activity = project.getActivityByName(activityName);
             assert activity != null : "Precondition failed: Activity must exist";
 
-            assert activity.isEmployeeAssigned(this) :
-                    "Precondition failed: Employee must be assigned to the activity";
+            if (!activity.isEmployeeAssigned(this)) {
+                throw new IllegalArgumentException("Employee is not assigned to the activity");
+            }
 
             timeRegistry.removeIf(e ->
                     e.getType() == TimeEntry.EntryType.Work &&

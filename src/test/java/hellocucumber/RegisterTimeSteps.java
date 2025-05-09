@@ -8,13 +8,14 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import static hellocucumber.SharedContext.projectSystem;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class RegisterTimeSteps {
 
     private Employee employee;
-    private ProjectSystem projectSystem;
+    //private ProjectSystem projectSystem;
     private Project project;
     private Activity activity;
     private String errorMessage;
@@ -24,7 +25,7 @@ public class RegisterTimeSteps {
 
     @Given("a project named {string} is prepared for time registration")
     public void prepareProjectForTimeRegistration(String projectName) {
-        projectSystem = new ProjectSystem();
+        //projectSystem = new ProjectSystem();
         project = projectSystem.getProjectByName(projectName);
         if (project == null) {
             project = projectSystem.createProject(projectName, LocalDate.now(), LocalDate.now().plusDays(30), 100);
@@ -51,8 +52,8 @@ public class RegisterTimeSteps {
         employee = new Employee(id);
         employee.logIn();
         // Only register with projectSystem if we're in a project context
-        if (projectSystem != null) {
-            projectSystem.registerEmployee(id);
+        projectSystem.registerEmployee(id);
+        if (project != null) {
             project.addEmployee(employee);
         }
     }

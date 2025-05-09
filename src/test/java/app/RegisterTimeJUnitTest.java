@@ -40,11 +40,11 @@ class RegisterTimeJUnitTest {
     @Test
     void throwsIfNotLoggedIn() {
         Employee e2 = new Employee("E2");
-        IllegalStateException ex = assertThrows(
-                IllegalStateException.class,
+        AssertionError ex = assertThrows(
+                AssertionError.class,
                 () -> e2.registerTime("Work", timePair("09:00", "17:00"), "P1", "Act1", system)
         );
-        assertEquals("User not logged in", ex.getMessage());
+        assertEquals("Precondition failed: User must be logged in", ex.getMessage());
     }
 
     @Test
@@ -70,39 +70,39 @@ class RegisterTimeJUnitTest {
 
     @Test
     void throwsIfTimeCrossesDateBoundary() {
-        IllegalArgumentException ex = assertThrows(
-                IllegalArgumentException.class,
+        AssertionError ex = assertThrows(
+                AssertionError.class,
                 () -> employee.registerTime("Work", new ArrayList<>(java.util.List.of("08/05/2025-23:00", "09/05/2025-01:00")), "P1", "Act1", system)
         );
-        assertEquals("Work hours must be registered on the same date", ex.getMessage());
+        assertEquals("Precondition failed: Work entries must be on the same date", ex.getMessage());
     }
 
 
     @Test
     void throwsOnInvalidDuration() {
-        IllegalArgumentException ex = assertThrows(
-                IllegalArgumentException.class,
+        AssertionError ex = assertThrows(
+                AssertionError.class,
                 () -> employee.registerTime("Work", timePair("10:00", "10:15"), "P1", "Act1", system)
         );
-        assertEquals("Invalid work duration", ex.getMessage());
+        assertEquals("Precondition failed: Duration must be between 0 and 24 hours, in 0.5-hour increments", ex.getMessage());
     }
 
     @Test
     void throwsIfProjectNotFound() {
-        IllegalArgumentException ex = assertThrows(
-                IllegalArgumentException.class,
+        AssertionError ex = assertThrows(
+                AssertionError.class,
                 () -> employee.registerTime("Work", timePair("09:00", "17:00"), "InvalidProject", "Act1", system)
         );
-        assertEquals("Project or activity not found", ex.getMessage());
+        assertEquals("Precondition failed: Project must exist", ex.getMessage());
     }
 
     @Test
     void throwsIfActivityNotFound() {
-        IllegalArgumentException ex = assertThrows(
-                IllegalArgumentException.class,
+        AssertionError ex = assertThrows(
+                AssertionError.class,
                 () -> employee.registerTime("Work", timePair("09:00", "17:00"), "P1", "InvalidActivity", system)
         );
-        assertEquals("Project or activity not found", ex.getMessage());
+        assertEquals("Precondition failed: Activity must exist", ex.getMessage());
     }
 
     @Test
@@ -157,11 +157,11 @@ class RegisterTimeJUnitTest {
         dates.add("05/06/2025");
         dates.add("01/06/2025");
 
-        IllegalArgumentException ex = assertThrows(
-                IllegalArgumentException.class,
+        AssertionError ex = assertThrows(
+                AssertionError.class,
                 () -> employee.registerTime("FreeTime", dates, "", "", system)
         );
-        assertEquals("Start date cannot be after end date", ex.getMessage());
+        assertEquals("Precondition failed: Start date cannot be after end date", ex.getMessage());
     }
 
     @Test
@@ -171,13 +171,13 @@ class RegisterTimeJUnitTest {
                 "", "", system);
         assertEquals("Absence registered", response1);
 
-        IllegalArgumentException ex = assertThrows(
-                IllegalArgumentException.class,
+        AssertionError ex = assertThrows(
+                AssertionError.class,
                 () -> employee.registerTime("FreeTime",
                         new ArrayList<>(java.util.List.of("03/06/2025", "05/06/2025")),
                         "", "", system)
         );
-        assertEquals("Overlapping time registration", ex.getMessage());
+        assertEquals("Precondition failed: No overlapping time registrations allowed", ex.getMessage());
     }
 
     @Test

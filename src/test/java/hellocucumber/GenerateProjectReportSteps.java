@@ -7,11 +7,11 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.stream.IntStream;
-
+import static hellocucumber.SharedContext.projectSystem;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class GenerateProjectReportSteps {
-    private final ProjectSystem projectSystem = AddEmployeeSteps.projectSystem;
+    //private final ProjectSystem projectSystem = AddEmployeeSteps.projectSystem;
     private Project currentReport;
     private String errorMessage;
 

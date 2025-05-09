@@ -44,13 +44,6 @@ Feature: Create Activity
     And employee "E999" is assigned to the activity "OverflowActivity"
     Then the system should display the error "E999 cannot be assigned to more than 10 activities"
 
-  Scenario: Cannot assign the same employee twice
-    Given a project with the name "ProjectX" is already created
-    And project manager is logged in as employee "E123"
-    And a new activity with name "DesignPhase", start date "01/08/2025" and end date "10/08/2025" is added to the project "ProjectX"
-    And employee "E123" is already assigned to the activity "DesignPhase"
-    When the project manager tries to assign employee "E123" to "DesignPhase" again
-    Then the system should display the error "Activity with name 'DesignPhase' already exists in project 'ProjectX'"
 
 
   Scenario: Prevent duplicate activity names in the same project

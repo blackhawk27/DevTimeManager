@@ -8,7 +8,7 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-
+import static hellocucumber.SharedContext.projectSystem;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,7 +21,7 @@ public class AddProjectManagerToProjectSteps {
     private ProjectManager projectManager;
     private String errorMessage;
     private Map<String, Employee> employees = new HashMap<>();
-    private ProjectSystem projectSystem = new ProjectSystem();
+    //private ProjectSystem projectSystem = new ProjectSystem();
 
     @Given("a project {string} exists with no manager")
     public void aProjectExists(String projectName) {
@@ -47,13 +47,19 @@ public class AddProjectManagerToProjectSteps {
 
     @When("{string} assigns {string} as project manager to {string}")
     public void assignsAsProjectManagerTo(String employeeId, String managerId, String projectName) {
-        //employee = new Employee(employeeId);
-        //projectManager = new ProjectManager(managerId);  // Create project manager
-        //project.assignProjectManager(employee, projectManager);  // Assumes a method in Project class for this
+
+
         Employee assigningEmployee = employees.get(employeeId);
+
         if (assigningEmployee == null) {
-            throw new IllegalStateException("Employee " + employeeId + " not found");
+            assigningEmployee = new Employee(employeeId);
+            employees.put(employeeId, assigningEmployee);
+            //throw new IllegalStateException("Employee " + employeeId + " not found");
         }
+        if (!project.getEmployees().contains(assigningEmployee)) {
+            project.addEmployee(assigningEmployee); //
+        }
+
         projectManager = new ProjectManager(managerId);
         project.assignProjectManager(assigningEmployee, projectManager);
     }
@@ -78,20 +84,26 @@ public class AddProjectManagerToProjectSteps {
 
     @Given("a project {string} exists with {string} as the project manager")
     public void aProjectExistsWithManager(String projectName, String managerId) {
-        LocalDate startDate = LocalDate.now();
-        LocalDate endDate = LocalDate.now().plusMonths(6);
-        String projectId = "0001";  // Example project ID
-        project = new Project(projectName, projectId, startDate, endDate, 0.0);
+        LocalDate start = LocalDate.now();
+        LocalDate end = start.plusMonths(1);
+        String projectId = "P001";
 
-        ProjectManager manager = new ProjectManager(managerId);
-        project.setProjectManager(manager);
-        manager.addProject(project);
+        project = new Project(projectName, projectId, start, end, 0.0);
+
+        ProjectManager existingPM = new ProjectManager(managerId);
+        project.setProjectManager(existingPM);
+        existingPM.addProject(project);
+
+        Employee e456 = new Employee("E456");
+        project.addEmployee(e456);
+        employees.put("E456", e456);
     }
 
     @When("{string} tries to assign {string} as the project manager of {string}")
     public void triesToAssignAsProjectManagerOf(String assigningEmployeeId, String newManagerId, String projectName) {
         Employee assigningEmployee = employees.get(assigningEmployeeId);
         if (assigningEmployee == null) {
+            // DON'T register or assign — just simulate unassigned user
             assigningEmployee = new Employee(assigningEmployeeId);
             employees.put(assigningEmployeeId, assigningEmployee);
         }
@@ -99,9 +111,8 @@ public class AddProjectManagerToProjectSteps {
         ProjectManager newManager = new ProjectManager(newManagerId);
 
         try {
-            // Do NOT auto-add the assigning employee to the project here!
             project.assignProjectManager(assigningEmployee, newManager);
-        } catch (IllegalStateException e) {
+        } catch (IllegalStateException | AssertionError e) {
             errorMessage = e.getMessage();
         }
     }

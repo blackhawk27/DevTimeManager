@@ -35,6 +35,7 @@ class ProjectJUnitTest {
     void cannotOverwriteManager() {
         p.assignProjectManager(e1, pm);
         Employee other = new Employee("teem");
+        p.addEmployee(other);
         ProjectManager pm2 = new ProjectManager("teem");
         IllegalStateException ex = assertThrows(
                 IllegalStateException.class,
