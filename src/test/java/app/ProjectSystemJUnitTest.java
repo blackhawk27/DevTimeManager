@@ -37,21 +37,22 @@ class ProjectSystemJUnitTest {
 
     @Test
     void cannotAddUnregisteredEmployee() {
-        IllegalArgumentException ex = assertThrows(
-                IllegalArgumentException.class,
+        AssertionError ex = assertThrows(
+                AssertionError.class,
                 () -> system.addEmployee("X99", "New Website")
         );
-        assertEquals("Employee with ID X99 does not exist", ex.getMessage());
+        assertTrue(ex.getMessage().contains("Precondition failed: employee must be registered"));
     }
 
     @Test
     void cannotAddToNonexistentProject() {
-        IllegalArgumentException ex = assertThrows(
-                IllegalArgumentException.class,
+        AssertionError ex = assertThrows(
+                AssertionError.class,
                 () -> system.addEmployee("huba", "NoSuchProj")
         );
-        assertEquals("Project with ID NoSuchProj does not exist", ex.getMessage());
+        assertTrue(ex.getMessage().contains("Precondition failed: project must exist"));
     }
+
 
     @Test
     void addEmployeeToActivitySuccessfully() {
@@ -68,11 +69,11 @@ class ProjectSystemJUnitTest {
     @Test
     void cannotAddToMissingActivity() {
         system.addEmployee("huba", "New Website");
-        IllegalArgumentException ex = assertThrows(
-                IllegalArgumentException.class,
+        AssertionError ex = assertThrows(
+                AssertionError.class,
                 () -> system.addEmployee("huba", "New Website", "NoAct")
         );
-        assertEquals("Activity NoAct not found in project New Website", ex.getMessage());
+        assertTrue(ex.getMessage().contains("Precondition failed: activity must exist"));
     }
 
     @Test

@@ -89,7 +89,7 @@ public class ProjectSystem {
     /**
      * Adds an employee to a project only.
      */
-    public void addEmployee(String employeeId, String projectName) {
+    /*public void addEmployee(String employeeId, String projectName) {
         if (!isRegistered(employeeId)) {
             throw new IllegalArgumentException(
                 "Employee with ID " + employeeId + " does not exist"
@@ -109,12 +109,32 @@ public class ProjectSystem {
         if (!project.getEmployees().contains(employee)) {
             project.addEmployee(employee); // Projektet håndterer selv sin liste
         }
+    }*/
+    public void addEmployee(String employeeId, String projectName) {
+        // Precondition asserts
+        assert employeeId != null && !employeeId.isEmpty() : "Precondition failed: employeeId must be non-null and non-empty";
+        assert projectName != null && !projectName.isEmpty() : "Precondition failed: projectName must be non-null and non-empty";
+        assert isRegistered(employeeId) : "Precondition failed: employee must be registered";
+
+        Project project = getProjectByName(projectName);
+        assert project != null : "Precondition failed: project must exist";
+
+        Employee employee = getEmployeeById(employeeId);
+        int initialEmployeeCount = project.getEmployees().size();
+
+        if (!project.getEmployees().contains(employee)) {
+            project.addEmployee(employee);
+        }
+
+        // Postcondition asserts
+        assert project.getEmployees().contains(employee) : "Postcondition failed: employee must be added to project";
+        assert project.getEmployees().size() >= initialEmployeeCount : "Postcondition failed: employee count must stay same or increase";
     }
 
     /**
      * Adds an employee to a project and an activity.
      */
-    public void addEmployee(String employeeId, String projectName, String activityName) {
+    /*public void addEmployee(String employeeId, String projectName, String activityName) {
         Employee employee = getEmployeeById(employeeId);
         Project project = getProjectByName(projectName);
         Activity activity = project.getActivityByName(activityName);
@@ -123,6 +143,27 @@ public class ProjectSystem {
         }
 
         activity.assignEmployee(employee);
+    }*/
+    public void addEmployee(String employeeId, String projectName, String activityName) {
+        // Precondition asserts
+        assert employeeId != null && !employeeId.isEmpty() : "Precondition failed: employeeId must be non-null and non-empty";
+        assert projectName != null && !projectName.isEmpty() : "Precondition failed: projectName must be non-null and non-empty";
+        assert activityName != null && !activityName.isEmpty() : "Precondition failed: activityName must be non-null and non-empty";
+
+        Project project = getProjectByName(projectName);
+        assert project != null : "Precondition failed: project must exist";
+
+        Activity activity = project.getActivityByName(activityName);
+        assert activity != null : "Precondition failed: activity must exist";
+
+        Employee employee = getEmployeeById(employeeId);
+
+
+        activity.assignEmployee(employee);
+
+        // Postcondition asserts
+        assert activity.isEmployeeAssigned(employee) : "Postcondition failed: employee must be assigned to activity";
+
     }
 
 
