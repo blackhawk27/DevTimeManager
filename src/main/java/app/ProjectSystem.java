@@ -136,8 +136,6 @@ public class ProjectSystem {
         projects.removeIf(project -> project.getName().equals(projectName));
     }
 
-
-
     public void resetForTest() {
         projects.clear();
         employees.clear();
